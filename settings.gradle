@@ -1,0 +1,1 @@
+include ':app', ':SharedPreferences', ':SharedPreferences_Annotation', ':SharedPreferences_Compiler', ':Router', ':Router_Annotation', ':Router_Compiler'

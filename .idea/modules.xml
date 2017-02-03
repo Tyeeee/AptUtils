@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AptUtils.iml" filepath="$PROJECT_DIR$/AptUtils.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Router/Router.iml" filepath="$PROJECT_DIR$/Router/Router.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Router_Annotation/router_annotation.iml" filepath="$PROJECT_DIR$/Router_Annotation/router_annotation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Router_Compiler/router_compiler.iml" filepath="$PROJECT_DIR$/Router_Compiler/router_compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SharedPreferences/SharedPreferences.iml" filepath="$PROJECT_DIR$/SharedPreferences/SharedPreferences.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SharedPreferences_Annotation/sharedpreferences_annotation.iml" filepath="$PROJECT_DIR$/SharedPreferences_Annotation/sharedpreferences_annotation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SharedPreferences_Compiler/sharedpreferences_compiler.iml" filepath="$PROJECT_DIR$/SharedPreferences_Compiler/sharedpreferences_compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
