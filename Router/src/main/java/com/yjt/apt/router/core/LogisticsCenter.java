@@ -20,7 +20,6 @@ import com.yjt.apt.router.model.Postcard;
 import com.yjt.apt.router.thread.CancelableCountDownLatch;
 import com.yjt.apt.router.utils.ClassUtil;
 import com.yjt.apt.router.utils.DebugUtil;
-import com.yjt.apt.router.utils.LogisticsCenter;
 import com.yjt.apt.router.utils.StringUtil;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -75,11 +74,11 @@ public class LogisticsCenter {
         }
     }
 
-    public synchronized void initialize(Context context, ThreadPoolExecutor executor) throws MainProcessException {
-        this.context = context;
+    public synchronized void initialize(Context ctx, ThreadPoolExecutor executor) throws MainProcessException {
+        this.context = ctx;
         this.executor = executor;
         try {
-            // These class was generate by arouter-compiler.
+            // These class was generate by Router-compiler.
             for (String className : ClassUtil.getInstance().getFileNameByPackageName(this.context, Constant.ROUTE_ROOT_PAKCAGE)) {
                 if (className.startsWith(Constant.ROUTE_ROOT_PAKCAGE + Constant.DOT + Constant.SDK_NAME + Constant.SEPARATOR + Constant.SUFFIX_ROOT)) {
                     // This one of root elements, load root.
@@ -92,7 +91,6 @@ public class LogisticsCenter {
                     ((IProviderGroup) (Class.forName(className).getConstructor().newInstance())).loadInto(providersIndex);
                 }
             }
-
             if (groupsIndex.size() == 0) {
                 DebugUtil.getInstance().error(Constant.TAG, "No mapping files were found, check your configuration please!");
             }
@@ -100,7 +98,7 @@ public class LogisticsCenter {
                 DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "logisticsCenter has already been loaded, GroupIndex[%d], InterceptorIndex[%d], ProviderIndex[%d]", groupsIndex.size(), interceptorsIndex.size(), providersIndex.size()));
             }
         } catch (IOException | InstantiationException | NoSuchMethodException | PackageManager.NameNotFoundException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
-            throw new MainProcessException(Constant.TAG + "ARouter init atlas exception! [" + e.getMessage() + "]");
+            throw new MainProcessException(Constant.TAG + "Router init atlas exception! [" + e.getMessage() + "]");
         }
     }
 
@@ -115,12 +113,12 @@ public class LogisticsCenter {
                             IInterceptor iInterceptor = interceptorClass.getConstructor().newInstance();
                             iInterceptor.init(context);
                             interceptors.add(iInterceptor);
-                        } catch (Exception ex) {
-                            throw new MainProcessException(Constant.TAG + "ARouter init interceptor error! name = [" + interceptorClass.getName() + "], reason = [" + ex.getMessage() + "]");
+                        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                            throw new MainProcessException(Constant.TAG + "Router init interceptor error! name = [" + interceptorClass.getName() + "], reason = [" + e.getMessage() + "]");
                         }
                     }
                     interceptorHasInit = true;
-                    DebugUtil.getInstance().info(Constant.TAG, "ARouter interceptors init over.");
+                    DebugUtil.getInstance().info(Constant.TAG, "Router interceptors init over.");
                     synchronized (interceptorInitLock){
                         interceptorInitLock.notifyAll();
                     }
@@ -135,7 +133,7 @@ public class LogisticsCenter {
                 try {
                     interceptorInitLock.wait(10 * 1000);
                 } catch (InterruptedException e) {
-                    throw new MainProcessException(Constant.TAG + "ARouter waiting for interceptor init error! reason = [" + e.getMessage() + "]");
+                    throw new MainProcessException(Constant.TAG + "Router waiting for interceptor init error! reason = [" + e.getMessage() + "]");
                 }
             }
         }
@@ -154,8 +152,8 @@ public class LogisticsCenter {
         if (null == postcard) {
             throw new RouteNotFoundException(Constant.TAG + "No postcard!");
         }
-        RouteMetadata RouteMetadata = routes.get(postcard.getPath());
-        if (null == RouteMetadata) {    // Maybe its does't exist, or didn't load.
+        RouteMetadata metadata = routes.get(postcard.getPath());
+        if (null == metadata) {    // Maybe its does't exist, or didn't load.
             Class<? extends IRouteGroup> groupMeta = groupsIndex.get(postcard.getGroup());  // Load route meta.
             if (null == groupMeta) {
                 throw new RouteNotFoundException(Constant.TAG + "There is no route match the path [" + postcard.getPath() + "], in group [" + postcard.getGroup() + "]");
@@ -170,25 +168,22 @@ public class LogisticsCenter {
                     iGroupInstance.loadInto(routes);
                     groupsIndex.remove(postcard.getGroup());
 
-                    if (Router.getInstance().debuggable()) {
-                        DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "The group [%s] has already been loaded, trigger by [%s]", postcard.getGroup(), postcard.getPath()));
-                    }
-                } catch (Exception e) {
+                    DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "The group [%s] has already been loaded, trigger by [%s]", postcard.getGroup(), postcard.getPath()));
+                } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     throw new MainProcessException(Constant.TAG + "Fatal exception when loading group meta. [" + e.getMessage() + "]");
                 }
 
                 completion(postcard);   // Reload
             }
         } else {
-            postcard.setDestination(RouteMetadata.getDestination());
-            postcard.setType(RouteMetadata.getType());
-            postcard.setPriority(RouteMetadata.getPriority());
-            postcard.setExtra(RouteMetadata.getExtra());
-
+            postcard.setDestination(metadata.getDestination());
+            postcard.setType(metadata.getType());
+            postcard.setPriority(metadata.getPriority());
+            postcard.setExtra(metadata.getExtra());
             Uri rawUri = postcard.getUri();
             if (null != rawUri) {   // Try to set params into bundle.
                 Map<String, String> resultMap = StringUtil.getInstance().splitQueryParameters(rawUri);
-                Map<String, Integer> paramsType = RouteMetadata.getParamsType();
+                Map<String, Integer> paramsType = metadata.getParamsType();
                 if (MapUtils.isNotEmpty(paramsType)) {
                     // Set value by its type, just for params which annotation by @Param
                     for (Map.Entry<String, Integer> params : paramsType.entrySet()) {
@@ -196,16 +191,16 @@ public class LogisticsCenter {
                         ));
                     }
                     // Save params name which need autoinject.
-                    postcard.getExtras().putStringArray(ARouter.AUTO_INJECT, paramsType.keySet().toArray(new String[]{}));
+                    postcard.getExtras().putStringArray(Constant.AUTO_INJECT, paramsType.keySet().toArray(new String[]{}));
                 }
                 // Save raw uri
-                postcard.putString(ARouter.RAW_URI, rawUri.toString());
+                postcard.putString(Constant.RAW_URI, rawUri.toString());
             }
 
-            switch (RouteMetadata.getType()) {
+            switch (metadata.getType()) {
                 case PROVIDER:  // if the route is provider, should find its instance
                     // Its provider, so it must be implememt IProvider
-                    Class<? extends IProvider> providerMeta = (Class<? extends IProvider>) RouteMetadata.getDestination();
+                    Class<? extends IProvider> providerMeta = (Class<? extends IProvider>) metadata.getDestination();
                     IProvider instance = providers.get(providerMeta);
                     if (null == instance) { // There's no instance of this provider
                         IProvider provider;
@@ -214,12 +209,12 @@ public class LogisticsCenter {
                             provider.init(context);
                             providers.put(providerMeta, provider);
                             instance = provider;
-                        } catch (Exception e) {
+                        } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
                             throw new MainProcessException("Init provider failed! " + e.getMessage());
                         }
                     }
                     postcard.setProvider(instance);
-                    postcard.greenChannel();    // Provider should skip all of interceptors
+                    postcard.setGreenChannel();    // Provider should skip all of interceptors
                     break;
                 default:
                     break;

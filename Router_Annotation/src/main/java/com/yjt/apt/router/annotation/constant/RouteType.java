@@ -8,7 +8,7 @@ public enum RouteType {
     BOARDCAST(-1, ""),
     METHOD(-1, ""),
     FRAGMENT(-1, "android.app.Fragment"),
-    PROVIDER(2, "com.alibaba.android.arouter.facade.template.IProvider"),
+    PROVIDER(2, "com.yjt.apt.router.listener.template.IProvider"),
     UNKNOWN(-1, "Unknown route type");
 
     int id;

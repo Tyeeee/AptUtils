@@ -27,11 +27,11 @@ public class InstrumentationHook extends Instrumentation {
 //        return activity;
 //    }
 
-    public Activity newActivity(ClassLoader cl, String className, Intent intent) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        Class<?> targetActivity = cl.loadClass(className);
+    public Activity newActivity(ClassLoader loader, String className, Intent intent) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+        Class<?> targetActivity = loader.loadClass(className);
         Object instanceOfTarget = targetActivity.newInstance();
         if (Router.getInstance().canAutoInject()) {
-            String[] autoInjectParams = intent.getStringArrayExtra(ARouter.AUTO_INJECT);
+            String[] autoInjectParams = intent.getStringArrayExtra(Constant.AUTO_INJECT);
             if (null != autoInjectParams && autoInjectParams.length > 0) {
                 for (String paramsName : autoInjectParams) {
                     Object value = intent.getExtras().get(StringUtil.getInstance().getLeft(paramsName));
@@ -40,7 +40,7 @@ public class InstrumentationHook extends Instrumentation {
                             Field injectField = targetActivity.getDeclaredField(StringUtil.getInstance().getLeft(paramsName));
                             injectField.setAccessible(true);
                             injectField.set(instanceOfTarget, value);
-                        } catch (Exception e) {
+                        } catch (NoSuchFieldException e) {
                             DebugUtil.getInstance().error(Constant.TAG, "Inject values for activity error! [" + e.getMessage() + "]");
                         }
                     }

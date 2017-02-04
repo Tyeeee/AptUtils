@@ -90,9 +90,9 @@ public final class Postcard extends RouteMetadata {
         return this;
     }
 
-    public Object navigation() {
-        return navigation(null);
-    }
+//    public Object navigation() {
+//        return navigation(null);
+//    }
 
     public Object navigation(Context context) {
         return navigation(context, null);
@@ -110,7 +110,7 @@ public final class Postcard extends RouteMetadata {
         Router.getInstance().navigation(mContext, this, requestCode, callback);
     }
 
-    public Postcard greenChannel() {
+    public Postcard setGreenChannel() {
         this.isGreenChannal = true;
         return this;
     }

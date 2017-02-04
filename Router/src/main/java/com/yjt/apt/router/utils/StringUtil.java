@@ -46,7 +46,6 @@ public class StringUtil {
         do {
             int next = query.indexOf('&', start);
             int end = (next == -1) ? query.length() : next;
-
             int separator = query.indexOf('=', start);
             if (separator > end || separator == -1) {
                 separator = end;

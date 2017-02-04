@@ -6,7 +6,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.yjt.apt"
-        minSdkVersion 19
+        minSdkVersion 18
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -29,6 +29,7 @@ dependencies {
     compile 'com.android.support:design:25.1.0'
     testCompile 'junit:junit:4.12'
     compile project(':Router')
+    compile project(':Router_Annotation')
     apt project(':Router_Compiler')
     compile project(':SharedPreferences')
     apt project(':SharedPreferences_Compiler')

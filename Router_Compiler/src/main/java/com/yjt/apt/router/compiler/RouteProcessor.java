@@ -80,7 +80,7 @@ public class RouteProcessor extends AbstractProcessor {
                                    "        moduleName project.getName();\n" +
                                    "    }\n" +
                                    "}\n");
-            throw new RuntimeException("ARouter::Compiler >>> No module name, for more information, look at gradle log.");
+            throw new RuntimeException("Router::Compiler >>> No module name, for more information, look at gradle log.");
         }
         messager.info(">>> RouteProcessor init. <<<");
     }
@@ -110,7 +110,7 @@ public class RouteProcessor extends AbstractProcessor {
             messager.info(">>> Found routes, start... <<<");
             parseRoutes(routeElements);
             parseResult = true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             messager.error(e);
         }
         return parseResult;
@@ -124,7 +124,7 @@ public class RouteProcessor extends AbstractProcessor {
             // Fantastic four
             TypeElement type_Activity = elements.getTypeElement(Constant.ACTIVITY);
             TypeElement type_Service = elements.getTypeElement(Constant.SERVICE);
-            // Interface of ARouter.
+            // Interface of Router.
             TypeElement type_IProvider = elements.getTypeElement(Constant.IPROVIDER);
             TypeElement type_IRouteGroup = elements.getTypeElement(Constant.IROUTE_GROUP);
             TypeElement type_IProviderGroup = elements.getTypeElement(Constant.IPROVIDER_GROUP);
@@ -338,7 +338,7 @@ public class RouteProcessor extends AbstractProcessor {
                 }
                 meta.setGroup(defaultGroup);
                 return true;
-            } catch (Exception e) {
+            } catch (StringIndexOutOfBoundsException e) {
                 messager.error("Failed to extract default group! " + e.getMessage());
                 return false;
             }

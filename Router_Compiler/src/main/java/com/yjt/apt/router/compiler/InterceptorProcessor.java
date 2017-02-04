@@ -70,11 +70,9 @@ public class InterceptorProcessor extends AbstractProcessor {
                                    "        moduleName project.getName();\n" +
                                    "    }\n" +
                                    "}\n");
-            throw new RuntimeException("ARouter::Compiler >>> No module name, for more information, look at gradle log.");
+            throw new RuntimeException("Router::Compiler >>> No module name, for more information, look at gradle log.");
         }
-
         typeMirror = elements.getTypeElement(Constant.IINTERCEPTOR).asType();
-
         messager.info(">>> InterceptorProcessor init. <<<");
     }
 
@@ -100,10 +98,9 @@ public class InterceptorProcessor extends AbstractProcessor {
         try {
             parseInterceptors(elements);
             parseResult = true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             messager.error(e);
         }
-
         return parseResult;
     }
 
@@ -126,7 +123,7 @@ public class InterceptorProcessor extends AbstractProcessor {
                 }
             }
 
-            // Interface of ARouter.
+            // Interface of Router.
             TypeElement type_ITollgate = this.elements.getTypeElement(Constant.IINTERCEPTOR);
             TypeElement type_ITollgateGroup = this.elements.getTypeElement(Constant.IINTERCEPTOR_GROUP);
 
