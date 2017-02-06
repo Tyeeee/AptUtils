@@ -80,6 +80,9 @@ public class LogisticsCenter {
         try {
             // These class was generate by Router-compiler.
             for (String className : ClassUtil.getInstance().getFileNameByPackageName(this.context, Constant.ROUTE_ROOT_PAKCAGE)) {
+                if (Router.getInstance().debuggable()) {
+                    DebugUtil.getInstance().debug(Constant.TAG, "className:" + className);
+                }
                 if (className.startsWith(Constant.ROUTE_ROOT_PAKCAGE + Constant.DOT + Constant.SDK_NAME + Constant.SEPARATOR + Constant.SUFFIX_ROOT)) {
                     // This one of root elements, load root.
                     ((IRouteRoot) (Class.forName(className).getConstructor().newInstance())).loadInto(groupsIndex);
@@ -95,7 +98,7 @@ public class LogisticsCenter {
                 DebugUtil.getInstance().error(Constant.TAG, "No mapping files were found, check your configuration please!");
             }
             if (Router.getInstance().debuggable()) {
-                DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "logisticsCenter has already been loaded, GroupIndex[%d], InterceptorIndex[%d], ProviderIndex[%d]", groupsIndex.size(), interceptorsIndex.size(), providersIndex.size()));
+                DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "LogisticsCenter has already been loaded, GroupIndex[%d], InterceptorIndex[%d], ProviderIndex[%d]", groupsIndex.size(), interceptorsIndex.size(), providersIndex.size()));
             }
         } catch (IOException | InstantiationException | NoSuchMethodException | PackageManager.NameNotFoundException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
             throw new MainProcessException(Constant.TAG + "Router init atlas exception! [" + e.getMessage() + "]");
@@ -140,22 +143,30 @@ public class LogisticsCenter {
     }
 
     public Postcard buildProvider(String serviceName) {
-        RouteMetadata meta = providersIndex.get(serviceName);
-        if (null == meta) {
+        RouteMetadata metadata = providersIndex.get(serviceName);
+        if (metadata == null) {
             return null;
         } else {
-            return new Postcard(meta.getPath(), meta.getGroup());
+            return new Postcard(metadata.getPath(), metadata.getGroup());
         }
     }
 
     public synchronized void completion(Postcard postcard) {
-        if (null == postcard) {
+        if (postcard == null) {
             throw new RouteNotFoundException(Constant.TAG + "No postcard!");
         }
         RouteMetadata metadata = routes.get(postcard.getPath());
-        if (null == metadata) {    // Maybe its does't exist, or didn't load.
-            Class<? extends IRouteGroup> groupMeta = groupsIndex.get(postcard.getGroup());  // Load route meta.
-            if (null == groupMeta) {
+        if (Router.getInstance().debuggable()) {
+            DebugUtil.getInstance().debug(Constant.TAG, postcard.toString());
+            DebugUtil.getInstance().debug(Constant.TAG, String.valueOf(routes.size()));
+        }
+        if (metadata == null) {    // Maybe its does't exist, or didn't load.
+            if (Router.getInstance().debuggable()) {
+                DebugUtil.getInstance().debug(Constant.TAG, "groupsIndex:" + groupsIndex.toString());
+                DebugUtil.getInstance().debug(Constant.TAG, String.valueOf(groupsIndex.size()));
+            }
+            Class<? extends IRouteGroup> groupMetadata = groupsIndex.get(postcard.getGroup());  // Load route meta.
+            if (groupMetadata == null) {
                 throw new RouteNotFoundException(Constant.TAG + "There is no route match the path [" + postcard.getPath() + "], in group [" + postcard.getGroup() + "]");
             } else {
                 // Load route and cache it into memory, then delete from metas.
@@ -163,19 +174,20 @@ public class LogisticsCenter {
                     if (Router.getInstance().debuggable()) {
                         DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "The group [%s] starts loading, trigger by [%s]", postcard.getGroup(), postcard.getPath()));
                     }
-
-                    IRouteGroup iGroupInstance = groupMeta.getConstructor().newInstance();
-                    iGroupInstance.loadInto(routes);
+                    groupMetadata.getConstructor().newInstance().loadInto(routes);
                     groupsIndex.remove(postcard.getGroup());
-
-                    DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "The group [%s] has already been loaded, trigger by [%s]", postcard.getGroup(), postcard.getPath()));
+                    if (Router.getInstance().debuggable()) {
+                        DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "The group [%s] has already been loaded, trigger by [%s]", postcard.getGroup(), postcard.getPath()));
+                    }
                 } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
                     throw new MainProcessException(Constant.TAG + "Fatal exception when loading group meta. [" + e.getMessage() + "]");
                 }
-
                 completion(postcard);   // Reload
             }
         } else {
+            if (Router.getInstance().debuggable()) {
+                DebugUtil.getInstance().debug(Constant.TAG, "metadata:" + metadata.toString());
+            }
             postcard.setDestination(metadata.getDestination());
             postcard.setType(metadata.getType());
             postcard.setPriority(metadata.getPriority());
@@ -202,7 +214,7 @@ public class LogisticsCenter {
                     // Its provider, so it must be implememt IProvider
                     Class<? extends IProvider> providerMeta = (Class<? extends IProvider>) metadata.getDestination();
                     IProvider instance = providers.get(providerMeta);
-                    if (null == instance) { // There's no instance of this provider
+                    if (instance == null) { // There's no instance of this provider
                         IProvider provider;
                         try {
                             provider = providerMeta.getConstructor().newInstance();
@@ -303,7 +315,8 @@ public class LogisticsCenter {
                 @Override
                 public void onInterrupt(Throwable exception) {
                     // Last interceptor excute over put fatal exception.
-                    postcard.setTag(null == exception ? new MainProcessException("No message.") : exception.getMessage());    // save the exception message for backup.
+                    postcard.setTag(exception == null ? new MainProcessException("No message.") : exception.getMessage());
+                    // save the exception message for backup.
                     counter.cancel();
                     // Be attention, maybe the thread in callback has been changed,
                     // then the catch block(L207) will be invalid.

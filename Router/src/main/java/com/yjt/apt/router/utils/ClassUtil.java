@@ -5,7 +5,10 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
+import android.text.TextUtils;
+
+import com.yjt.apt.router.Router;
+import com.yjt.apt.router.constant.Constant;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,9 +57,12 @@ public class ClassUtil {
     public List<String> getFileNameByPackageName(Context context, String packageName) throws PackageManager.NameNotFoundException, IOException {
         List<String> classNames = new ArrayList<>();
         for (String path : getSourcePaths(context)) {
+            if (Router.getInstance().debuggable()) {
+                DebugUtil.getInstance().debug(Constant.TAG, "path: " + path);
+            }
             DexFile dexfile;
             if (path.endsWith(EXTRACTED_SUFFIX)) {
-                //NOT use new DexFile(path), because it will throw "permission error in /data/dalvik-cache"
+                //Don't use new DexFile(path), because it will throw "permission error in /data/dalvik-cache"
                 dexfile = DexFile.loadDex(path, path + ".tmp", 0);
             } else {
                 dexfile = new DexFile(path);
@@ -64,13 +70,18 @@ public class ClassUtil {
             Enumeration<String> dexEntries = dexfile.entries();
             while (dexEntries.hasMoreElements()) {
                 String className = dexEntries.nextElement();
+                if (Router.getInstance().debuggable()) {
+                    DebugUtil.getInstance().debug(Constant.TAG, "packageName: " + packageName);
+                    DebugUtil.getInstance().debug(Constant.TAG, "className: " + className);
+                }
                 if (className.contains(packageName)) {
                     classNames.add(className);
                 }
             }
         }
-
-        Log.d("galaxy", "Filter " + classNames.size() + " classes by packageName <" + packageName + ">");
+        if (Router.getInstance().debuggable()) {
+            DebugUtil.getInstance().debug(Constant.TAG, "Filter:" + classNames.size() + " classes by packageName <" + packageName + ">");
+        }
         return classNames;
     }
 
@@ -90,7 +101,6 @@ public class ClassUtil {
             //the total dex numbers
             int totalDexNumber = getMultiDexPreferences(context).getInt(KEY_DEX_NUMBER, 1);
             File dexDir = new File(applicationInfo.dataDir, SECONDARY_FOLDER_NAME);
-
             for (int secondaryNumber = 2; secondaryNumber <= totalDexNumber; secondaryNumber++) {
                 //for each dex file, ie: test.classes2.zip, test.classes3.zip...
                 String fileName = extractedFilePrefix + secondaryNumber + EXTRACTED_SUFFIX;
@@ -103,7 +113,6 @@ public class ClassUtil {
                 }
             }
         }
-
         return sourcePaths;
     }
 
@@ -117,7 +126,10 @@ public class ClassUtil {
             } else {    // 非YunOS原生Android
                 vmName = "'Android'";
                 String versionString = System.getProperty("java.vm.version");
-                if (versionString != null) {
+                if (Router.getInstance().debuggable()) {
+                    DebugUtil.getInstance().debug(Constant.TAG, "versionString:" + versionString);
+                }
+                if (TextUtils.isEmpty(versionString)) {
                     Matcher matcher = Pattern.compile("(\\d+)\\.(\\d+)(\\.\\d+)?").matcher(versionString);
                     if (matcher.matches()) {
                         try {
@@ -128,6 +140,7 @@ public class ClassUtil {
                                     && (minor >= VM_WITH_MULTIDEX_VERSION_MINOR));
                         } catch (NumberFormatException ignore) {
                             // let isMultidexCapable be false
+                            isMultidexCapable = false;
                         }
                     }
                 }
@@ -135,7 +148,9 @@ public class ClassUtil {
         } catch (Exception ignore) {
 
         }
-        Log.i("galaxy", "VM with name " + vmName + (isMultidexCapable ? " has multidex support" : " does not have multidex support"));
+        if (Router.getInstance().debuggable()) {
+            DebugUtil.getInstance().debug(Constant.TAG, "VM with name:" + vmName + (isMultidexCapable ? " has multidex support" : " does not have multidex support"));
+        }
         return isMultidexCapable;
     }
 

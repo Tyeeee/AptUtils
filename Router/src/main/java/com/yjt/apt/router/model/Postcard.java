@@ -42,7 +42,7 @@ public final class Postcard extends RouteMetadata {
         setPath(path);
         setGroup(group);
         setUri(uri);
-        this.bundle = (null == bundle ? new Bundle() : bundle);
+        this.bundle = (bundle == null ? new Bundle() : bundle);
     }
 
 

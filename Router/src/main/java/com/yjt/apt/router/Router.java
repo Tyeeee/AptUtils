@@ -63,11 +63,13 @@ public final class Router {
     }
 
     public synchronized boolean initialize(Application application) {
-        DebugUtil.getInstance().info(Constant.TAG, "Router init start.");
-        context = application;
-        LogisticsCenter.getInstance().initialize(context, executor);
-        DebugUtil.getInstance().info(Constant.TAG, "Router init success!");
-        hasInitialized = true;
+        if (!hasInitialized) {
+            DebugUtil.getInstance().info(Constant.TAG, "Router init start.");
+            context = application;
+            LogisticsCenter.getInstance().initialize(context, executor);
+            DebugUtil.getInstance().info(Constant.TAG, "Router init success!");
+            hasInitialized = true;
+        }
         if (hasInitialized) {
             LogisticsCenter.getInstance().initializeInterceptors();
         }
@@ -103,7 +105,7 @@ public final class Router {
         return autoInject;
     }
 
-    void attachBaseContext() {
+    public void attachBaseContext() {
         Log.i(Constant.TAG, "Router start attachBaseContext");
         try {
             Class<?> mMainThreadClass = Class.forName("android.app.ActivityThread");
@@ -151,16 +153,16 @@ public final class Router {
         if (StringUtils.isEmpty(path)) {
             throw new MainProcessException(Constant.TAG + "Parameter is invalid!");
         } else {
-            PathReplaceService pService = navigation(PathReplaceService.class);
-            if (null != pService) {
-                path = pService.forString(path);
+            PathReplaceService service = navigation(PathReplaceService.class);
+            if (null != service) {
+                path = service.forString(path);
             }
             return build(path, extractGroup(path));
         }
     }
 
     Postcard build(Uri uri) {
-        if (null == uri || StringUtils.isEmpty(uri.toString())) {
+        if (uri == null || StringUtils.isEmpty(uri.toString())) {
             throw new MainProcessException(Constant.TAG + "Parameter invalid!");
         } else {
             PathReplaceService pService = navigation(PathReplaceService.class);
@@ -256,7 +258,7 @@ public final class Router {
     }
 
     private Object navigation(final Context ctx, final Postcard postcard, final int requestCode) {
-        Context currentContext = null == ctx ? context : ctx;
+        Context currentContext = ctx == null ? context : ctx;
         switch (postcard.getType()) {
             case ACTIVITY:
                 // Build intent

@@ -24,9 +24,9 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
     private static DefaultThreadPoolExecutor instance;
 
     public static DefaultThreadPoolExecutor getInstance() {
-        if (null == instance) {
+        if (instance == null) {
             synchronized (DefaultThreadPoolExecutor.class){
-                if (null == instance) {
+                if (instance == null) {
                     instance = new DefaultThreadPoolExecutor(
                             INIT_THREAD_COUNT,
                             MAX_THREAD_COUNT,
