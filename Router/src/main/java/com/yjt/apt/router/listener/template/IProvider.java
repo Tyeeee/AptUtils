@@ -4,5 +4,5 @@ import android.content.Context;
 
 public interface IProvider {
 
-    void init(Context context);
+    void initialize(Context context);
 }

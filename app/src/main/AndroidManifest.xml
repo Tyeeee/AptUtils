@@ -22,7 +22,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".router.SchameFilterActivity">
+        <activity android:name=".test.router.RouterActivity"/>
+        <activity android:name=".test.router.TestActivity1"/>
+        <activity android:name=".test.router.TestActivity2"/>
+        <activity android:name=".test.router.TestActivity3"/>
+        <activity android:name=".test.router.TestActivity6"/>
+        <activity android:name=".test.router.Activity1"/>
+        <activity android:name=".test.router.Activity2"/>
+        <activity android:name=".test.router.Activity3"/>
+        <activity android:name=".test.router.Activity4"/>
+        <activity android:name=".test.router.SchameFilterActivity">
 
             <!-- Schame -->
             <intent-filter>
@@ -49,12 +58,6 @@
                     android:scheme="https"/>
             </intent-filter>
         </activity>
-        <activity android:name=".router.RouterActivity"/>
-        <activity android:name=".router.WebviewActivity"/>
-        <activity android:name=".router.Activity1"/>
-        <activity android:name=".router.Activity2"/>
-        <activity android:name=".router.Activity3"/>
-        <activity android:name=".router.Activity4"/>
     </application>
 
 </manifest>

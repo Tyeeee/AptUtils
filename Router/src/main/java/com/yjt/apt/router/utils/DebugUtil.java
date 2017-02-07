@@ -45,40 +45,35 @@ public class DebugUtil implements ILog {
     @Override
     public void debug(String tag, String message) {
         if (isShowLog) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
-            Log.d(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(stackTraceElement));
+            Log.d(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(Thread.currentThread().getStackTrace()[3]));
         }
     }
 
     @Override
     public void info(String tag, String message) {
         if (isShowLog) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
-            Log.i(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(stackTraceElement));
+            Log.i(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(Thread.currentThread().getStackTrace()[3]));
         }
     }
 
     @Override
     public void warning(String tag, String message) {
         if (isShowLog) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
-            Log.w(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(stackTraceElement));
+            Log.w(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(Thread.currentThread().getStackTrace()[3]));
         }
     }
 
     @Override
     public void error(String tag, String message) {
         if (isShowLog) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
-            Log.e(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(stackTraceElement));
+            Log.e(TextUtils.isEmpty(tag) ? getDefaultTag() : tag, message + getExtInfo(Thread.currentThread().getStackTrace()[3]));
         }
     }
 
     @Override
     public void monitor(String message) {
         if (isShowLog && isMonitorMode()) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
-            Log.d(defaultTag + "::monitor", message + getExtInfo(stackTraceElement));
+            Log.d(defaultTag + "::monitor", message + getExtInfo(Thread.currentThread().getStackTrace()[3]));
         }
     }
 

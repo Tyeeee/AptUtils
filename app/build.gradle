@@ -95,9 +95,10 @@ dependencies {
     compile 'com.android.support:design:25.1.0'
     testCompile 'junit:junit:4.12'
     compile project(':Router')
-    compile project(':Router_Annotation')
     apt project(':Router_Compiler')
 //    annotationProcessor 'com.yjt.apt:Router_Compiler:x.x.x'
+    compile project(':TestModule')
+    
     compile project(':SharedPreferences')
     apt project(':SharedPreferences_Compiler')
 }

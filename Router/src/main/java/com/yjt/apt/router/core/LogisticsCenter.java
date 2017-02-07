@@ -52,7 +52,7 @@ public class LogisticsCenter {
 
     private Context context;
     private ThreadPoolExecutor executor;
-    private boolean interceptorHasInit;
+    private boolean interceptorHasInitialized;
     private static final Object interceptorInitLock = new Object();
 
     private static LogisticsCenter logisticsCenter;
@@ -101,7 +101,7 @@ public class LogisticsCenter {
                 DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "LogisticsCenter has already been loaded, GroupIndex[%d], InterceptorIndex[%d], ProviderIndex[%d]", groupsIndex.size(), interceptorsIndex.size(), providersIndex.size()));
             }
         } catch (IOException | InstantiationException | NoSuchMethodException | PackageManager.NameNotFoundException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
-            throw new MainProcessException(Constant.TAG + "Router init atlas exception! [" + e.getMessage() + "]");
+            throw new MainProcessException(Constant.TAG + "Router initialize atlas exception! [" + e.getMessage() + "]");
         }
     }
 
@@ -114,14 +114,14 @@ public class LogisticsCenter {
                         Class<? extends IInterceptor> interceptorClass = entry.getValue();
                         try {
                             IInterceptor iInterceptor = interceptorClass.getConstructor().newInstance();
-                            iInterceptor.init(context);
+                            iInterceptor.initialize(context);
                             interceptors.add(iInterceptor);
                         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                            throw new MainProcessException(Constant.TAG + "Router init interceptor error! name = [" + interceptorClass.getName() + "], reason = [" + e.getMessage() + "]");
+                            throw new MainProcessException(Constant.TAG + "Router initialize interceptor error! name = [" + interceptorClass.getName() + "], reason = [" + e.getMessage() + "]");
                         }
                     }
-                    interceptorHasInit = true;
-                    DebugUtil.getInstance().info(Constant.TAG, "Router interceptors init over.");
+                    interceptorHasInitialized = true;
+                    DebugUtil.getInstance().info(Constant.TAG, "Router interceptors initialize over.");
                     synchronized (interceptorInitLock){
                         interceptorInitLock.notifyAll();
                     }
@@ -130,13 +130,13 @@ public class LogisticsCenter {
         });
     }
 
-    private void checkInterceptorsInitStatus() {
+    private void checkInterceptorsInitializeStatus() {
         synchronized (interceptorInitLock){
-            while (!interceptorHasInit) {
+            while (!interceptorHasInitialized) {
                 try {
                     interceptorInitLock.wait(10 * 1000);
                 } catch (InterruptedException e) {
-                    throw new MainProcessException(Constant.TAG + "Router waiting for interceptor init error! reason = [" + e.getMessage() + "]");
+                    throw new MainProcessException(Constant.TAG + "Router waiting for interceptor initialize error! reason = [" + e.getMessage() + "]");
                 }
             }
         }
@@ -195,7 +195,7 @@ public class LogisticsCenter {
             Uri rawUri = postcard.getUri();
             if (null != rawUri) {   // Try to set params into bundle.
                 Map<String, String> resultMap = StringUtil.getInstance().splitQueryParameters(rawUri);
-                Map<String, Integer> paramsType = metadata.getParamsType();
+                Map<String, Integer> paramsType = metadata.getParametersType();
                 if (MapUtils.isNotEmpty(paramsType)) {
                     // Set value by its type, just for params which annotation by @Param
                     for (Map.Entry<String, Integer> params : paramsType.entrySet()) {
@@ -218,7 +218,7 @@ public class LogisticsCenter {
                         IProvider provider;
                         try {
                             provider = providerMeta.getConstructor().newInstance();
-                            provider.init(context);
+                            provider.initialize(context);
                             providers.put(providerMeta, provider);
                             instance = provider;
                         } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
@@ -272,10 +272,10 @@ public class LogisticsCenter {
         }
     }
 
-    public void interception(final Postcard postcard, final InterceptorCallback callback) throws MainProcessException {
+    public void intercept(final Postcard postcard, final InterceptorCallback callback) throws MainProcessException {
         if (CollectionUtils.isNotEmpty(interceptors)) {
-            checkInterceptorsInitStatus();
-            if (!interceptorHasInit) {
+            checkInterceptorsInitializeStatus();
+            if (!interceptorHasInitialized) {
                 callback.onInterrupt(new MainProcessException("Interceptors initialization takes too much time."));
                 return;
             }
@@ -284,7 +284,7 @@ public class LogisticsCenter {
                 public void run() {
                     CancelableCountDownLatch interceptorCounter = new CancelableCountDownLatch(interceptors.size());
                     try {
-                        _excute(0, interceptorCounter, postcard);
+                        execute(0, interceptorCounter, postcard);
                         interceptorCounter.await(postcard.getTimeout(), TimeUnit.SECONDS); // Cancel the navigation this time, if it hasn't return anythings.
                         if (null != postcard.getTag()) {    // Maybe some exception in the tag.
                             callback.onInterrupt(new MainProcessException(postcard.getTag().toString()));
@@ -301,20 +301,20 @@ public class LogisticsCenter {
         }
     }
 
-    private void _excute(final int index, final CancelableCountDownLatch counter, final Postcard postcard) {
+    private void execute(final int index, final CancelableCountDownLatch counter, final Postcard postcard) {
         if (index < interceptors.size()) {
             interceptors.get(index).process(postcard, new InterceptorCallback() {
 
                 @Override
                 public void onContinue(Postcard postcard) {
-                    // Last interceptor excute over put no exception.
+                    // Last interceptor execute over put no exception.
                     counter.countDown();
-                    _excute(index + 1, counter, postcard);  // When counter is down, it will be execute continue ,but index bigger than interceptors size, then U know.
+                    execute(index + 1, counter, postcard);  // When counter is down, it will be execute continue ,but index bigger than interceptors size, then U know.
                 }
 
                 @Override
                 public void onInterrupt(Throwable exception) {
-                    // Last interceptor excute over put fatal exception.
+                    // Last interceptor execute over put fatal exception.
                     postcard.setTag(exception == null ? new MainProcessException("No message.") : exception.getMessage());
                     // save the exception message for backup.
                     counter.cancel();
@@ -336,6 +336,6 @@ public class LogisticsCenter {
         providersIndex.clear();
         interceptors.clear();
         interceptorsIndex.clear();
-        interceptorHasInit = false;
+        interceptorHasInitialized = false;
     }
 }

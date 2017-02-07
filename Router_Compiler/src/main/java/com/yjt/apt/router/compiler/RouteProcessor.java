@@ -226,7 +226,7 @@ public class RouteProcessor extends AbstractProcessor {
 
                     // Make map body for ParametersType
                     StringBuilder builder = new StringBuilder();
-                    Map<String, Integer> ParametersType = metadata.getParamsType();
+                    Map<String, Integer> ParametersType = metadata.getParametersType();
                     if (MapUtils.isNotEmpty(ParametersType)) {
                         for (Map.Entry<String, Integer> types : ParametersType.entrySet()) {
                             builder.append("put(\"").append(types.getKey()).append("\", ").append(types.getValue()).append("); ");
@@ -294,11 +294,6 @@ public class RouteProcessor extends AbstractProcessor {
         }
     }
 
-    /**
-     * Sort metas in group.
-     *
-     * @Parameter routeMete metas.
-     */
     private void categories(RouteMetadata routeMete) {
         if (routeVerify(routeMete)) {
             messager.info(">>> Start categories, group = " + routeMete.getGroup() + ", path = " + routeMete.getPath() + " <<<");

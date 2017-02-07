@@ -16,7 +16,7 @@ public class RouteMetadata {
     private String group;           // Group of route
     private int priority = -1;      // The smaller the number, the higher the priority
     private int extra;              // Extra data
-    private Map<String, Integer> paramsType;  // Param type
+    private Map<String, Integer> parametersType;  // Param type
 
     public RouteMetadata() { }
 
@@ -32,27 +32,27 @@ public class RouteMetadata {
         this(type, null, destination, route.path(), route.group(), null, route.priority(), route.extras());
     }
 
-    public RouteMetadata(Route route, Element rawType, RouteType type, Map<String, Integer> paramsType) {
-        this(type, rawType, null, route.path(), route.group(), paramsType, route.priority(), route.extras());
+    public RouteMetadata(Route route, Element rawType, RouteType type, Map<String, Integer> parametersType) {
+        this(type, rawType, null, route.path(), route.group(), parametersType, route.priority(), route.extras());
     }
 
-    public RouteMetadata(RouteType type, Element rawType, Class<?> destination, String path, String group, Map<String, Integer> paramsType, int priority, int extra) {
+    public RouteMetadata(RouteType type, Element rawType, Class<?> destination, String path, String group, Map<String, Integer> parametersType, int priority, int extra) {
         this.type = type;
         this.destination = destination;
         this.rawType = rawType;
         this.path = path;
         this.group = group;
-        this.paramsType = paramsType;
+        this.parametersType = parametersType;
         this.priority = priority;
         this.extra = extra;
     }
 
-    public Map<String, Integer> getParamsType() {
-        return paramsType;
+    public Map<String, Integer> getParametersType() {
+        return parametersType;
     }
 
-    public RouteMetadata setParamsType(Map<String, Integer> paramsType) {
-        this.paramsType = paramsType;
+    public RouteMetadata setParametersType(Map<String, Integer> parametersType) {
+        this.parametersType = parametersType;
         return this;
     }
 

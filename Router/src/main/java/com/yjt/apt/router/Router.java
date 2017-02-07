@@ -44,7 +44,7 @@ public final class Router {
 
     public static synchronized Router getInstance() {
 //        if (!hasInitialized) {
-//            throw new InitializedException("RouterCore::Init::Invoke init(context) first!");
+//            throw new InitializedException("RouterCore::Init::Invoke initialize(context) first!");
 //        } else 
         if (instance == null) {
             synchronized (Router.class){
@@ -64,16 +64,16 @@ public final class Router {
 
     public synchronized boolean initialize(Application application) {
         if (!hasInitialized) {
-            DebugUtil.getInstance().info(Constant.TAG, "Router init start.");
+            DebugUtil.getInstance().info(Constant.TAG, "Router initialize start.");
             context = application;
             LogisticsCenter.getInstance().initialize(context, executor);
-            DebugUtil.getInstance().info(Constant.TAG, "Router init success!");
+            DebugUtil.getInstance().info(Constant.TAG, "Router initialize success!");
             hasInitialized = true;
-        }
-        if (hasInitialized) {
             LogisticsCenter.getInstance().initializeInterceptors();
+            DebugUtil.getInstance().info(Constant.TAG, "Router initialize over.");
+        } else {
+            DebugUtil.getInstance().info(Constant.TAG, "Router has been initialized.");
         }
-        DebugUtil.getInstance().info(Constant.TAG, "Router init over.");
         return true;
     }
 
@@ -97,7 +97,7 @@ public final class Router {
         DebugUtil.getInstance().info(Constant.TAG, "Router openLog");
     }
 
-    synchronized void enableAutoInject() {
+    public synchronized void enableAutoInject() {
         autoInject = true;
     }
 
@@ -149,7 +149,7 @@ public final class Router {
         return debuggable;
     }
 
-    Postcard build(String path) {
+    public Postcard build(String path) {
         if (StringUtils.isEmpty(path)) {
             throw new MainProcessException(Constant.TAG + "Parameter is invalid!");
         } else {
@@ -161,25 +161,25 @@ public final class Router {
         }
     }
 
-    Postcard build(Uri uri) {
+    public Postcard build(Uri uri) {
         if (uri == null || StringUtils.isEmpty(uri.toString())) {
             throw new MainProcessException(Constant.TAG + "Parameter invalid!");
         } else {
-            PathReplaceService pService = navigation(PathReplaceService.class);
-            if (null != pService) {
-                uri = pService.forUri(uri);
+            PathReplaceService service = navigation(PathReplaceService.class);
+            if (null != service) {
+                uri = service.forUri(uri);
             }
             return new Postcard(uri.getPath(), extractGroup(uri.getPath()), uri, null);
         }
     }
 
-    Postcard build(String path, String group) {
+    public Postcard build(String path, String group) {
         if (StringUtils.isEmpty(path) || StringUtils.isEmpty(group)) {
             throw new MainProcessException(Constant.TAG + "Parameter is invalid!");
         } else {
-            PathReplaceService pService = navigation(PathReplaceService.class);
-            if (null != pService) {
-                path = pService.forString(path);
+            PathReplaceService service = navigation(PathReplaceService.class);
+            if (null != service) {
+                path = service.forString(path);
             }
             return new Postcard(path, group);
         }
@@ -239,7 +239,7 @@ public final class Router {
         }
 
         if (!postcard.isGreenChannal()) {   // It must be run in async thread, maybe interceptor cost too mush time made ANR.
-            LogisticsCenter.getInstance().interception(postcard, new InterceptorCallback() {
+            LogisticsCenter.getInstance().intercept(postcard, new InterceptorCallback() {
 
                 @Override
                 public void onContinue(Postcard postcard) {
