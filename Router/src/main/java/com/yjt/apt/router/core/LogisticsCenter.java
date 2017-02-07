@@ -68,7 +68,7 @@ public class LogisticsCenter {
         return logisticsCenter;
     }
 
-    public static void releaseInstance() {
+    public static synchronized void releaseInstance() {
         if (logisticsCenter != null) {
             logisticsCenter = null;
         }

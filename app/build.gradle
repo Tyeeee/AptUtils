@@ -97,7 +97,7 @@ dependencies {
     compile project(':Router')
     apt project(':Router_Compiler')
 //    annotationProcessor 'com.yjt.apt:Router_Compiler:x.x.x'
-    compile project(':TestModule')
+//    compile project(':TestModule')
     
     compile project(':SharedPreferences')
     apt project(':SharedPreferences_Compiler')

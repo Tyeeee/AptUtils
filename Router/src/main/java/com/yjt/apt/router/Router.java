@@ -56,7 +56,7 @@ public final class Router {
         return instance;
     }
 
-    public static void releaseInstance() {
+    public static synchronized void releaseInstance() {
         if (instance != null) {
             instance = null;
         }

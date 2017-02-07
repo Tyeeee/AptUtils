@@ -23,18 +23,15 @@
 
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
 
-#-keepattributes Exceptions
-#-keepattributes InnerClasses
-#-keepattributes Signature
-#-keepattributes Deprecated
-#-keepattributes SourceFile
-#-keepattributes LineNumberTable
-#-keepattributes EnclosingMethod  
+-keepattributes Exceptions
+-keepattributes InnerClasses
+-keepattributes Signature
+-keepattributes Deprecated
+-keepattributes SourceFile
+-keepattributes LineNumberTable
+-keepattributes EnclosingMethod  
 -keepattributes *Annotation*
-#-keepattributes *JavascriptInterface*
-#-keepclassmembers class *{
-#    public void call(java.lang.String);
-#}
+-keepattributes *JavascriptInterface*
 
 -keep public class * extends android.app.Activity      
 -keep public class * extends android.app.Application   

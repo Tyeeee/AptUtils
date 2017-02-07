@@ -1,0 +1,100 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+version = PROJECT_VERSION
+group = PROJECT_GROUP
+project.archivesBaseName = PROJECT_ARTIFACTID
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+//tasks.withType(Javadoc) {
+//    options.encoding = "UTF-8"
+//}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.artifactId = PROJECT_ARTIFACTID
+        pom {
+            project {
+                description PROJECT_DESCRIPTION
+                packaging 'jar'
+                name PROJECT_NAME
+                url PROJECT_WEBSITE_URL
+                licenses {
+                    license {
+                        name LICENSE_NAME
+                        url LICENSE_URL
+                    }
+                }
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+                scm {
+                    connection PROJECT_VCS_URL
+                    developerConnection PROJECT_VCS_URL
+                    url PROJECT_WEBSITE_URL
+                }
+            }
+        }
+    }
+}
+
+def propertiesFile = project.rootProject.file('local.properties')
+if (propertiesFile.canRead()) {
+    Properties properties = new Properties()
+    properties.load(propertiesFile.newDataInputStream())
+    if (properties != null && properties.containsKey('bintray.user') && properties.containsKey('bintray.apikey')) {
+        bintray {
+            user = properties['bintray.user']
+            key = properties['bintray.apikey']
+            configurations = ['archives']
+            pkg {
+                labels = ['Router_Compiler']
+                repo = "maven"
+                name = PROJECT_NAME
+                description PROJECT_DESCRIPTION
+                websiteUrl = PROJECT_WEBSITE_URL
+                vcsUrl = PROJECT_VCS_URL
+                licenses = ["Apache-2.0"]
+                publish = true
+            }
+        }
+    } else {
+        println 'signing.properties found but some entries are missing'
+    }
+} else {
+    println 'signing.properties not found'
+}

@@ -21,7 +21,7 @@ public class StringUtil {
         return stringUtil;
     }
 
-    public static void releaseInstance() {
+    public static synchronized void releaseInstance() {
         if (stringUtil != null) {
             stringUtil = null;
         }

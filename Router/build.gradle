@@ -1,4 +1,27 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def releaseProperties() {
+    def propertiesFile = file('keystore.properties')
+    if (propertiesFile.canRead()) {
+        def Properties properties = new Properties()
+        properties.load(new FileInputStream(propertiesFile))
+        if (properties != null && properties.containsKey('STORE_FILE') && properties.containsKey('STORE_PASSWORD') &&
+                properties.containsKey('KEY_ALIAS') && properties.containsKey('KEY_PASSWORD')) {
+            android.signingConfigs.release.storeFile = file(properties['STORE_FILE'])
+            android.signingConfigs.release.storePassword = properties['STORE_PASSWORD']
+            android.signingConfigs.release.keyAlias = properties['KEY_ALIAS']
+            android.signingConfigs.release.keyPassword = properties['KEY_PASSWORD']
+        } else {
+            println 'signing.properties found but some entries are missing'
+            android.buildTypes.release.signingConfig = null
+        }
+    } else {
+        println 'signing.properties not found'
+        android.buildTypes.release.signingConfig = null
+    }
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -10,11 +33,46 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+    signingConfigs {
+        debug {}
         release {
+            storeFile
+            storePassword
+            keyAlias
+            keyPassword
+        }
+    }
+    buildTypes {
+        debug {
             minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+        release {
+//            minifyEnabled true
+            minifyEnabled false
+            zipAlignEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    releaseProperties()
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            resources.srcDirs = ['src/main/resources']
+            aidl.srcDirs = ['src/main/aidl']
+            renderscript.srcDirs = ['src/maom']
+            res.srcDirs = ['src/main/res']
+            assets.srcDirs = ['src/main/assets']
+        }
+        instrumentTest.setRoot('src/androidTest')
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
     }
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibilityVersion
@@ -36,3 +94,4 @@ dependencies {
     compile project(':Router_Annotation')
     compile 'org.apache.commons:commons-lang3:3.5'
 }
+apply from: "bintray_push.gradle"

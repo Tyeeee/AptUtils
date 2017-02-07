@@ -24,7 +24,7 @@ public class DebugUtil implements ILog {
         return DebugUtil;
     }
 
-    public static void releaseInstance() {
+    public static synchronized void releaseInstance() {
         if (DebugUtil != null) {
             DebugUtil = null;
         }

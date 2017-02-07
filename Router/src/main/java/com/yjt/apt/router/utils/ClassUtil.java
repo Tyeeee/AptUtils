@@ -44,7 +44,7 @@ public class ClassUtil {
         return classUtil;
     }
 
-    public static void releaseInstance() {
+    public static synchronized void releaseInstance() {
         if (classUtil != null) {
             classUtil = null;
         }
