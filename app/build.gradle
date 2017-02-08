@@ -53,10 +53,10 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-//            minifyEnabled true
-            minifyEnabled false
+            minifyEnabled true
+//            minifyEnabled false
             zipAlignEnabled true
-            shrinkResources true
+            shrinkResources false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -91,14 +91,15 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    testCompile 'junit:junit:4.12'
+    compile deps.appcompat_v7
+    compile deps.design
+    testCompile deps.junit
+    
     compile project(':Router')
     apt project(':Router_Compiler')
 //    annotationProcessor 'com.yjt.apt:Router_Compiler:x.x.x'
 //    compile project(':TestModule')
-    
+
     compile project(':SharedPreferences')
     apt project(':SharedPreferences_Compiler')
 }

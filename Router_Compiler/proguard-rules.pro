@@ -20,9 +20,6 @@
 -dontusemixedcaseclassnames   # 是否使用大小写混合
 -dontpreverify           # 混淆时是否做预校验
 -verbose                # 混淆时是否记录日志
--dontnote
--dontskipnonpubliclibraryclassmembers
--printconfiguration
 
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
 
@@ -44,25 +41,11 @@
 -keep public class * extends android.app.backup.BackupAgentHelper 
 -keep public class * extends android.preference.Preference        
 -keep public class com.android.vending.licensing.ILicensingService    
--keep class * extends java.lang.annotation.Annotation { *; }
-#-keep,allowobfuscation @interface android.support.annotation.Keep
-#-keep @android.support.annotation.Keep class *
 
-#-keep public class org.apache.commons.collections4.**{*;}
-#-keep public class org.apache.commons.lang3.**{*;}
-#-keep public class com.google.auto.service.**{*;}
-#-keep public class com.squareup.javapoet.**{*;}
 -keep public class com.yjt.apt.router.Router
 -keep public class com.yjt.apt.router.listener.**{*;}
 -keep public class com.yjt.apt.router.model.**{*;}
--keep class com.yjt.apt.router.annotation.**{*;}
 
--keepclasseswithmembernames class * { 
-    @com.yjt.apt.router.annotation.* <methods>; 
-}
--keepclasseswithmembernames class * { 
-    @com.yjt.apt.router.annotation.* <fields>; 
-}
 -keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
     native <methods>;
 }
@@ -82,9 +65,6 @@
 -keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆  
     public static final android.os.Parcelable$Creator *;
 }
-#-keepclassmembers class * {
-#    @android.support.annotation.Keep *;
-#}
 -keepclassmembers class com.yjt.apt.router.Router { 
     public static synchronized <methods>;
     public synchronized <methods>;
@@ -92,7 +72,7 @@
    	public com.yjt.apt.router.model.Postcard build(java.lang.String);
    	public com.yjt.apt.router.model.Postcard build(android.net.Uri);
    	public com.yjt.apt.router.model.Postcard build(java.lang.String, java.lang.String);
-   	public *** navigation(java.lang.Class);
+   	public java.lang.Class navigation(java.lang.Class);
    	public java.lang.Object navigation(android.content.Context, com.yjt.apt.router.model.Postcard, int, com.yjt.apt.router.listener.callback.NavigationCallback);
    	public java.lang.Object navigation(android.content.Context, com.yjt.apt.router.model.Postcard, int);
 }

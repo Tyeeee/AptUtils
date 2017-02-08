@@ -1,1 +1,1 @@
-include ':app', ':Router', ':Router_Annotation', ':Router_Compiler', ':TestModule', ':SharedPreferences', ':SharedPreferences_Annotation', ':SharedPreferences_Compiler'
+include ':app', ':Router', ':Router_Annotation', ':Router_Compiler', /*':TestModule',*/ ':SharedPreferences', ':SharedPreferences_Annotation', ':SharedPreferences_Compiler'

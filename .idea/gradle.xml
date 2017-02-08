@@ -14,7 +14,6 @@
             <option value="$PROJECT_DIR$/SharedPreferences" />
             <option value="$PROJECT_DIR$/SharedPreferences_Annotation" />
             <option value="$PROJECT_DIR$/SharedPreferences_Compiler" />
-            <option value="$PROJECT_DIR$/TestModule" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

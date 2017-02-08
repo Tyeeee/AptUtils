@@ -9,7 +9,6 @@
       <module fileurl="file://$PROJECT_DIR$/SharedPreferences/SharedPreferences.iml" filepath="$PROJECT_DIR$/SharedPreferences/SharedPreferences.iml" />
       <module fileurl="file://$PROJECT_DIR$/SharedPreferences_Annotation/SharedPreferences_Annotation.iml" filepath="$PROJECT_DIR$/SharedPreferences_Annotation/SharedPreferences_Annotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/SharedPreferences_Compiler/SharedPreferences_Compiler.iml" filepath="$PROJECT_DIR$/SharedPreferences_Compiler/SharedPreferences_Compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TestModule/TestModule.iml" filepath="$PROJECT_DIR$/TestModule/TestModule.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -20,7 +20,7 @@
 -dontusemixedcaseclassnames   # 是否使用大小写混合
 -dontpreverify           # 混淆时是否做预校验
 -verbose                # 混淆时是否记录日志
-
+-dontnote
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
 
 -keepattributes Exceptions
@@ -42,9 +42,9 @@
 -keep public class * extends android.preference.Preference        
 -keep public class com.android.vending.licensing.ILicensingService    
 
--keep public class com.yjt.apt.router.**{*;}
--keep public class com.yjt.apt.sp.**{*;}
-#-keep public class com.yjt.apt.router.routes.**{*;}
+-keep public class com.yjt.apt.router.routes.**{*;}
+#-keep public class com.yjt.apt.router.**{*;}
+#-keep public class com.yjt.apt.sp.**{*;}
 
 -keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
     native <methods>;

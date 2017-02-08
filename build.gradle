@@ -23,6 +23,11 @@ allprojects {
             dirs 'libs'
         }
     }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
 }
 
 ext {
@@ -33,6 +38,16 @@ ext {
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
 }
+
+ext.deps = [
+        appcompat_v7        : 'com.android.support:appcompat-v7:25.1.0',
+        design              : 'com.android.support:design:25.1.0',
+        junit               : 'junit:junit:4.12',
+        commons_collections4: 'org.apache.commons:commons-collections4:4.1',
+        commons_lang3       : 'org.apache.commons:commons-lang3:3.5',
+        auto_service        : 'com.google.auto.service:auto-service:1.0-rc2',
+        javapoet            : 'com.squareup:javapoet:1.8.0'
+]
 
 task clean(type: Delete) {
     delete rootProject.buildDir

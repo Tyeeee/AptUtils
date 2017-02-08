@@ -83,7 +83,7 @@ public class InterceptorProcessor extends AbstractProcessor {
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
-        return super.getSupportedSourceVersion();
+        return SourceVersion.latestSupported();
     }
 
     @Override

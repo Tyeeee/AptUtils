@@ -50,10 +50,10 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-//            minifyEnabled true
-            minifyEnabled false
+            minifyEnabled true
+//            minifyEnabled false
             zipAlignEnabled true
-            shrinkResources true
+            shrinkResources false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -88,10 +88,10 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    testCompile 'junit:junit:4.12'
-    compile 'org.apache.commons:commons-collections4:4.1'
+    compile deps.appcompat_v7
+    testCompile deps.junit
+    compile deps.commons_collections4
+    compile deps.commons_lang3
     compile project(':Router_Annotation')
-    compile 'org.apache.commons:commons-lang3:3.5'
 }
-apply from: "bintray_push.gradle"
+//apply from: "bintray_push.gradle"
