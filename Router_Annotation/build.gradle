@@ -6,3 +6,5 @@ targetCompatibility = rootProject.ext.targetCompatibilityVersion
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+apply from: "bintray_push.gradle"

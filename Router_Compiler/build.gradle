@@ -11,3 +11,5 @@ dependencies {
     compile deps.commons_lang3
     compile project(':Router_Annotation')
 }
+
+apply from: "bintray_push.gradle"

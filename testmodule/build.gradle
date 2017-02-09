@@ -78,7 +78,9 @@ android {
         targetCompatibility rootProject.ext.targetCompatibilityVersion
     }
     lintOptions {
-        abortOnError false
+        abortOnError true
+        textReport true
+        textOutput 'stdout'
     }
 }
 

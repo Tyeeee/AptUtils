@@ -82,7 +82,9 @@ android {
         release.setRoot('build-types/release')
     }
     lintOptions {
-        abortOnError false
+        textReport true
+        textOutput 'stdout'
+        abortOnError true
     }
 }
 
@@ -94,7 +96,8 @@ dependencies {
     compile deps.appcompat_v7
     compile deps.design
     testCompile deps.junit
-    
+
+//    compile deps.Router
     compile project(':Router')
     apt project(':Router_Compiler')
 //    annotationProcessor 'com.yjt.apt:Router_Compiler:x.x.x'

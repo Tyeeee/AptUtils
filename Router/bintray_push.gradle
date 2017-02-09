@@ -4,49 +4,30 @@ apply plugin: 'com.jfrog.bintray'
 
 version = PROJECT_VERSION
 group = PROJECT_GROUP
-project.archivesBaseName = PROJECT_ARTIFACTID
+project.archivesBaseName = PROJECT_ARTIFACT_ID
 
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
+task androidDocs(type: Javadoc) {
+    source = android.sourceSets.main.java.source
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task androidDocsAar(type: Jar, dependsOn: androidDocs) {
     classifier = 'javadoc'
-    from javadoc.destinationDir
+    from androidDocs.destinationDir
 }
 
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-//tasks.withType(Javadoc) {
-//    options.encoding = "UTF-8"
-//}
-
-javadoc {
-    options {
-        encoding "UTF-8"
-        charSet 'UTF-8'
-        author true
-        version true
-        links "http://docs.oracle.com/javase/7/docs/api"
-    }
+task androidSourcesAar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.source
 }
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = PROJECT_ARTIFACTID
+        pom.artifactId = PROJECT_ARTIFACT_ID
         pom {
             project {
                 description PROJECT_DESCRIPTION
-                packaging 'aar'
+                packaging PROJECT_PACKAGING
                 name PROJECT_NAME
                 url PROJECT_WEBSITE_URL
                 licenses {
@@ -63,13 +44,40 @@ install {
                     }
                 }
                 scm {
-                    connection PROJECT_VCS_URL
-                    developerConnection PROJECT_VCS_URL
-                    url PROJECT_WEBSITE_URL
+                    connection PROJECT_SCM_CONNECTION
+                    developerConnection PROJECT_SCM_DEVELOPER_CONNECTION
+                    url PROJECT_SCM_URL
                 }
             }
         }
     }
+}
+
+//tasks.withType(Javadoc) {
+//    options.encoding = "UTF-8"
+//}
+
+androidDocs {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
+artifacts {
+    archives androidDocsAar
+    archives androidSourcesAar
 }
 
 def propertiesFile = project.rootProject.file('local.properties')
@@ -82,7 +90,7 @@ if (propertiesFile.canRead()) {
             key = properties['bintray.apikey']
             configurations = ['archives']
             pkg {
-                labels = ['Router', 'Router_Compiler']
+                labels = ['Heepay', 'HeepaySDK']
                 repo = "maven"
                 name = PROJECT_NAME
                 description PROJECT_DESCRIPTION
