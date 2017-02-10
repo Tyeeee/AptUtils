@@ -32,7 +32,6 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles 'proguard-rules.pro'
     }
     signingConfigs {
         debug {}
@@ -56,7 +55,7 @@ android {
             zipAlignEnabled true
             shrinkResources false
             signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules.pro'
         }
     }
     releaseProperties()
