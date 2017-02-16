@@ -92,8 +92,9 @@ dependencies {
     compile deps.appcompat_v7
     testCompile deps.junit
 //    compile project(':Router')
-    compile(name: 'Router', ext: 'aar')
+//    compile(name: 'Router', ext: 'aar')
 //    apt project(':Router_Compiler')
+    compile deps.Router
     apt deps.Router_Compiler
     compile deps.Router_Annotation
 }

@@ -47,7 +47,7 @@ ext.deps = [
         auto_service        : 'com.google.auto.service:auto-service:1.0-rc2',
         javapoet            : 'com.squareup:javapoet:1.8.0',
 
-        Router              : 'com.yjt.apt:Router:0.0.3',
+        Router              : 'com.yjt.apt:Router:0.0.4',
         Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.3',
         Router_Compiler     : 'com.yjt.apt:Router_Compiler:0.0.3'
 ]
