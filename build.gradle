@@ -30,7 +30,7 @@ allprojects {
 }
 
 ext {
-    minSdkVersion = 18
+    minSdkVersion = 19
     targetSdkVersion = 25
     compileSdkVersion = 25
     buildToolsVersion = "25.0.2"
@@ -47,8 +47,8 @@ ext.deps = [
         auto_service        : 'com.google.auto.service:auto-service:1.0-rc2',
         javapoet            : 'com.squareup:javapoet:1.8.0',
 
-        Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.3',
         Router              : 'com.yjt.apt:Router:0.0.3',
+        Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.3',
         Router_Compiler     : 'com.yjt.apt:Router_Compiler:0.0.3'
 ]
 

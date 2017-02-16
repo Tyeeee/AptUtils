@@ -50,8 +50,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled true
-//            minifyEnabled false
+//            minifyEnabled true
+            minifyEnabled false
             zipAlignEnabled true
             shrinkResources false
             signingConfig signingConfigs.release
@@ -79,9 +79,10 @@ android {
         targetCompatibility rootProject.ext.targetCompatibilityVersion
     }
     lintOptions {
-        abortOnError true
-        textReport true
-        textOutput 'stdout'
+//        textReport true
+//        textOutput 'stdout'
+//        abortOnError true
+        abortOnError false
     }
 }
 

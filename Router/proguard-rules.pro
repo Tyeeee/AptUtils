@@ -45,16 +45,16 @@
 -keep public class * extends android.preference.Preference        
 -keep public class com.android.vending.licensing.ILicensingService    
 -keep class * extends java.lang.annotation.Annotation { *; }
-#-keep,allowobfuscation @interface android.support.annotation.Keep
-#-keep @android.support.annotation.Keep class *
 
-#-keep public class org.apache.commons.collections4.**{*;}
-#-keep public class org.apache.commons.lang3.**{*;}
+-keep public class org.apache.commons.collections4.**{*;}
+-keep public class org.apache.commons.lang3.**{*;}
 #-keep public class com.google.auto.service.**{*;}
 #-keep public class com.squareup.javapoet.**{*;}
--keep public class com.yjt.apt.router.Router
--keep public class com.yjt.apt.router.listener.**{*;}
--keep public class com.yjt.apt.router.model.**{*;}
+-keep public final class com.yjt.apt.router.Router
+-keep public class com.yjt.apt.router.listener.callback.**{*;}
+-keep public class com.yjt.apt.router.listener.service.**{*;}
+-keep public class com.yjt.apt.router.listener.template.**{*;}
+-keep public final class com.yjt.apt.router.model.**{*;}
 -keep class com.yjt.apt.router.annotation.**{*;}
 
 -keepclasseswithmembernames class * { 
@@ -82,9 +82,6 @@
 -keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆  
     public static final android.os.Parcelable$Creator *;
 }
-#-keepclassmembers class * {
-#    @android.support.annotation.Keep *;
-#}
 -keepclassmembers class com.yjt.apt.router.Router { 
     public static synchronized <methods>;
     public synchronized <methods>;

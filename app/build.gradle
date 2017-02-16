@@ -82,12 +82,12 @@ android {
         release.setRoot('build-types/release')
     }
     lintOptions {
-        textReport true
-        textOutput 'stdout'
-        abortOnError true
+//        textReport true
+//        textOutput 'stdout'
+//        abortOnError true
+        abortOnError false
     }
 }
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -97,14 +97,20 @@ dependencies {
     compile deps.design
     testCompile deps.junit
 
+//    compile deps.Router
+    apt deps.Router_Compiler
+//    annotationProcessor deps.Router_Compiler
+    compile deps.Router_Annotation
+
 //    compile project(':Router')
 //    apt project(':Router_Compiler')
-//    annotationProcessor 'com.yjt.apt:Router_Compiler:x.x.x'
-//    compile project(':TestModule')
+    compile(name: 'Router', ext: 'aar')
+    compile project(':TestModule')
 
 //    compile project(':SharedPreferences')
 //    apt project(':SharedPreferences_Compiler')
 }
+
 
 apt {
     arguments {
