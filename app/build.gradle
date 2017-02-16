@@ -96,15 +96,18 @@ dependencies {
     compile deps.appcompat_v7
     compile deps.design
     testCompile deps.junit
-
+    
+    compile deps.commons_collections4
+    compile deps.commons_lang3
+    
 //    compile deps.Router
     apt deps.Router_Compiler
 //    annotationProcessor deps.Router_Compiler
     compile deps.Router_Annotation
 
-    compile project(':Router')
+//    compile project(':Router')
 //    apt project(':Router_Compiler')
-//    compile(name: 'Router', ext: 'aar')
+    compile(name: 'Router', ext: 'aar')
 //    compile project(':TestModule')
 
 //    compile project(':SharedPreferences')
