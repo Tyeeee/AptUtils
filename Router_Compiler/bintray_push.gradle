@@ -84,7 +84,7 @@ if (propertiesFile.canRead()) {
             key = properties['bintray.apikey']
             configurations = ['archives']
             pkg {
-                labels = ['Heepay', 'HeepaySDK']
+                labels = ['Router_Compiler']
                 repo = "maven"
                 name = PROJECT_NAME
                 description PROJECT_DESCRIPTION

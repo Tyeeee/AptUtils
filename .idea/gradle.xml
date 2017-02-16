@@ -9,11 +9,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/Router" />
-            <option value="$PROJECT_DIR$/Router_Annotation" />
-            <option value="$PROJECT_DIR$/Router_Compiler" />
-            <option value="$PROJECT_DIR$/SharedPreferences" />
-            <option value="$PROJECT_DIR$/SharedPreferences_Annotation" />
-            <option value="$PROJECT_DIR$/SharedPreferences_Compiler" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

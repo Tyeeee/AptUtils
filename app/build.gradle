@@ -97,16 +97,13 @@ dependencies {
     compile deps.design
     testCompile deps.junit
 
-    compile deps.Router
-    compile deps.Router_Annotation
-    annotationProcessor deps.Router_Compiler
 //    compile project(':Router')
 //    apt project(':Router_Compiler')
 //    annotationProcessor 'com.yjt.apt:Router_Compiler:x.x.x'
 //    compile project(':TestModule')
 
-    compile project(':SharedPreferences')
-    apt project(':SharedPreferences_Compiler')
+//    compile project(':SharedPreferences')
+//    apt project(':SharedPreferences_Compiler')
 }
 
 apt {

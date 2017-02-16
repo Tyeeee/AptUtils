@@ -6,14 +6,14 @@ version = PROJECT_VERSION
 group = PROJECT_GROUP
 project.archivesBaseName = PROJECT_ARTIFACT_ID
 
-task androidDocs(type: Javadoc) {
+task androidDoc(type: Javadoc) {
     source = android.sourceSets.main.java.source
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
 
-task androidDocsAar(type: Jar, dependsOn: androidDocs) {
+task androidDocAar(type: Jar, dependsOn: androidDoc) {
     classifier = 'javadoc'
-    from androidDocs.destinationDir
+    from androidDoc.destinationDir
 }
 
 task androidSourcesAar(type: Jar) {
@@ -57,7 +57,7 @@ install {
 //    options.encoding = "UTF-8"
 //}
 
-androidDocs {
+androidDoc {
     options {
         encoding "UTF-8"
         charSet 'UTF-8'
@@ -76,7 +76,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 artifacts {
-    archives androidDocsAar
+    archives androidDocAar
     archives androidSourcesAar
 }
 
@@ -90,7 +90,7 @@ if (propertiesFile.canRead()) {
             key = properties['bintray.apikey']
             configurations = ['archives']
             pkg {
-                labels = ['Heepay', 'HeepaySDK']
+                labels = ['Router']
                 repo = "maven"
                 name = PROJECT_NAME
                 description PROJECT_DESCRIPTION

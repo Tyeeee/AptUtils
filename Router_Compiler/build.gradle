@@ -9,7 +9,7 @@ dependencies {
     compile deps.javapoet
     compile deps.commons_collections4
     compile deps.commons_lang3
-    compile project(':Router_Annotation')
+    compile deps.Router_Annotation
 }
 
 apply from: "bintray_push.gradle"
