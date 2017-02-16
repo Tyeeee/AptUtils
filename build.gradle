@@ -50,6 +50,8 @@ ext.deps = [
         Router              : 'com.yjt.apt:Router:0.0.4',
         Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.3',
         Router_Compiler     : 'com.yjt.apt:Router_Compiler:0.0.3'
+//        bintray.user=crazy-ann
+//        bintray.apikey=29965b96525a9e1afedc6c67882d2b080e71c5ed
 ]
 
 task clean(type: Delete) {
