@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AptUtils.iml" filepath="$PROJECT_DIR$/AptUtils.iml" />
       <module fileurl="file://$PROJECT_DIR$/Router/Router.iml" filepath="$PROJECT_DIR$/Router/Router.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TestModule/TestModule.iml" filepath="$PROJECT_DIR$/TestModule/TestModule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Router/Router.iml" filepath="$PROJECT_DIR$/Router/Router.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

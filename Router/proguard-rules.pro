@@ -46,8 +46,8 @@
 -keep public class com.android.vending.licensing.ILicensingService    
 -keep class * extends java.lang.annotation.Annotation { *; }
 
--keep public class org.apache.commons.collections4.**{*;}
--keep public class org.apache.commons.lang3.**{*;}
+#-keep public class org.apache.commons.collections4.**{*;}
+#-keep public class org.apache.commons.lang3.**{*;}
 #-keep public class com.google.auto.service.**{*;}
 #-keep public class com.squareup.javapoet.**{*;}
 -keep public final class com.yjt.apt.router.Router

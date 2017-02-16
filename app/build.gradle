@@ -102,10 +102,10 @@ dependencies {
 //    annotationProcessor deps.Router_Compiler
     compile deps.Router_Annotation
 
-//    compile project(':Router')
+    compile project(':Router')
 //    apt project(':Router_Compiler')
-    compile(name: 'Router', ext: 'aar')
-    compile project(':TestModule')
+//    compile(name: 'Router', ext: 'aar')
+//    compile project(':TestModule')
 
 //    compile project(':SharedPreferences')
 //    apt project(':SharedPreferences_Compiler')

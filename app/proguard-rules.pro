@@ -42,6 +42,8 @@
 -keep public class * extends android.preference.Preference        
 -keep public class com.android.vending.licensing.ILicensingService    
 
+-keep public class org.apache.commons.collections4.**{*;}
+-keep public class org.apache.commons.lang3.**{*;}
 -dontwarn com.yjt.apt.**
 #-keep public class com.yjt.apt.router.**{*;}
 #-keep public class com.yjt.apt.router.routes.**{*;}
