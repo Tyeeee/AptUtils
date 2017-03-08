@@ -7,9 +7,11 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.CLASS)
-public @interface Parameter {
+public @interface Autowired {
 
     String name() default "";
 
-    String desc() default "No description.";
+    boolean required() default false;
+
+    String description() default "No description.";
 }

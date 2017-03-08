@@ -1,4 +1,4 @@
-package com.yjt.apt.router.compiler;
+package com.yjt.apt.router.compiler.processor;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Sets;
@@ -9,12 +9,13 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.WildcardTypeName;
-import com.yjt.apt.router.annotation.Parameter;
+import com.yjt.apt.router.annotation.Autowired;
 import com.yjt.apt.router.annotation.Route;
 import com.yjt.apt.router.annotation.constant.RouteType;
 import com.yjt.apt.router.annotation.model.RouteMetadata;
-import com.yjt.apt.router.compiler.messager.Messager;
 import com.yjt.apt.router.compiler.constant.Constant;
+import com.yjt.apt.router.compiler.messager.Messager;
+import com.yjt.apt.router.compiler.utils.TypeUtil;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -38,7 +39,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -46,6 +46,9 @@ import javax.lang.model.util.Types;
 import static javax.lang.model.element.Modifier.PUBLIC;
 
 @AutoService(Processor.class)
+//@SupportedOptions(Constant.KEY_MODULE_NAME)
+//@SupportedSourceVersion(SourceVersion.RELEASE_7)
+//@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_ROUTE, Constant.ANNOTATION_TYPE_AUTOWIRED})
 public class RouteProcessor extends AbstractProcessor {
 
     private Map<String, Set<RouteMetadata>> groupMap = new HashMap<>(); // ModuleName and RouteMetadata.
@@ -59,12 +62,10 @@ public class RouteProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-
         filer = processingEnv.getFiler();                  // Generate class.
         types = processingEnv.getTypeUtils();            // Get type utils.
         elements = processingEnv.getElementUtils();      // Get class meta.
         messager = new Messager(processingEnv.getMessager());   // Package the log utils.
-
         // Attempt to get user configuration [moduleName]
         Map<String, String> options = processingEnv.getOptions();
         if (MapUtils.isNotEmpty(options)) {
@@ -80,7 +81,7 @@ public class RouteProcessor extends AbstractProcessor {
                                    "        moduleName project.getName();\n" +
                                    "    }\n" +
                                    "}\n");
-            throw new RuntimeException("Router::Compiler >>> No module name, for more information, look at gradle log.");
+            throw new RuntimeException("Router_RouteProcessor::Compiler >>> No module name, for more information, look at gradle log.");
         }
         messager.info(">>> RouteProcessor init. <<<");
     }
@@ -89,6 +90,7 @@ public class RouteProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> supportAnnotations = new HashSet<>();
         supportAnnotations.add(Route.class.getCanonicalName());     // This annotation mark class which can be router.
+        supportAnnotations.add(Autowired.class.getCanonicalName());     // This annotation mark class which can be router.
         return supportAnnotations;
     }
 
@@ -104,16 +106,16 @@ public class RouteProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Set<? extends Element> routeElements = roundEnv.getElementsAnnotatedWith(Route.class);
-        boolean parseResult = false;
-        try {
-            messager.info(">>> Found routes, start... <<<");
-            parseRoutes(routeElements);
-            parseResult = true;
-        } catch (IOException e) {
-            messager.error(e);
+        if (CollectionUtils.isNotEmpty(annotations)) {
+            try {
+                messager.info(">>> Found routes, start... <<<");
+                parseRoutes(roundEnv.getElementsAnnotatedWith(Route.class));
+            } catch (IOException e) {
+                messager.error(e);
+            }
+            return true;
         }
-        return parseResult;
+        return false;
     }
 
     private void parseRoutes(Set<? extends Element> routeElements) throws IOException {
@@ -128,7 +130,7 @@ public class RouteProcessor extends AbstractProcessor {
             TypeElement type_IProvider = elements.getTypeElement(Constant.IPROVIDER);
             TypeElement type_IRouteGroup = elements.getTypeElement(Constant.IROUTE_GROUP);
             TypeElement type_IProviderGroup = elements.getTypeElement(Constant.IPROVIDER_GROUP);
-            ClassName RouteMetadataCn = ClassName.get(RouteMetadata.class);
+            ClassName routeMetadataCn = ClassName.get(RouteMetadata.class);
             ClassName routeTypeCn = ClassName.get(RouteType.class);
 
             ParameterizedTypeName inputMapTypeOfRoot = ParameterizedTypeName.get(
@@ -157,34 +159,30 @@ public class RouteProcessor extends AbstractProcessor {
 
             //  Follow a sequence, find out metas of group first, generate java file, then statistics them as root.
             for (Element element : routeElements) {
-                TypeMirror tm = element.asType();
+                TypeMirror typeMirror = element.asType();
                 Route route = element.getAnnotation(Route.class);
                 RouteMetadata routeMete = null;
 
-                if (types.isSubtype(tm, type_Activity.asType())) {                 // Activity
-                    messager.info(">>> Found activity route: " + tm.toString() + " <<<");
+                if (types.isSubtype(typeMirror, type_Activity.asType())) {// Activity
+                    messager.info(">>> Found activity route: " + typeMirror.toString() + " <<<");
 
-                    // Get all fields annotation by @Parameter
+                    // Get all fields annotation by @Autowired
                     Map<String, Integer> parametersType = new HashMap<>();
                     for (Element field : element.getEnclosedElements()) {
-                        if (field.getKind().isField() && field.getAnnotation(Parameter.class) != null) {
-                            Parameter ParameterConfig = field.getAnnotation(Parameter.class);
-                            parametersType.put(StringUtils.isEmpty(ParameterConfig.name()) ? field.getSimpleName().toString() : field.getSimpleName().toString() + "|" + ParameterConfig.name(), exchange(field.asType()));
+                        if (field.getKind().isField() && field.getAnnotation(Autowired.class) != null && !types.isSubtype(field.asType(), type_IProvider.asType())) {
+                            Autowired parameterConfig = field.getAnnotation(Autowired.class);
+                            parametersType.put(StringUtils.isEmpty(parameterConfig.name()) ? field.getSimpleName().toString() : field.getSimpleName().toString() + "|" + parameterConfig.name(), TypeUtil.typeExchange(field.asType()));
                         }
                     }
-                    parametersType.size();
                     routeMete = new RouteMetadata(route, element, RouteType.ACTIVITY, parametersType);
-                } else if (types.isSubtype(tm, type_IProvider.asType())) {         // IProvider
-                    messager.info(">>> Found provider route: " + tm.toString() + " <<<");
+                } else if (types.isSubtype(typeMirror, type_IProvider.asType())) {         // IProvider
+                    messager.info(">>> Found provider route: " + typeMirror.toString() + " <<<");
                     routeMete = new RouteMetadata(route, element, RouteType.PROVIDER, null);
-                } else if (types.isSubtype(tm, type_Service.asType())) {           // Service
-                    messager.info(">>> Found service route: " + tm.toString() + " <<<");
+                } else if (types.isSubtype(typeMirror, type_Service.asType())) {           // Service
+                    messager.info(">>> Found service route: " + typeMirror.toString() + " <<<");
                     routeMete = new RouteMetadata(route, element, RouteType.parse(Constant.SERVICE), null);
                 }
                 categories(routeMete);
-//                if (StringUtils.isEmpty(moduleName)) {   // Hasn't generate the module name.
-//                    moduleName = ModuleUtils.generateModuleName(element, messager);
-//                }
             }
 
             MethodSpec.Builder loadIntoMethodOfProviderBuilder = MethodSpec.methodBuilder(Constant.METHOD_LOAD_INTO)
@@ -206,13 +204,13 @@ public class RouteProcessor extends AbstractProcessor {
                     switch (metadata.getType()) {
                         case PROVIDER:  // Need cache provider's super class
                             List<? extends TypeMirror> interfaces = ((TypeElement) metadata.getRawType()).getInterfaces();
-                            for (TypeMirror tm : interfaces) {
-                                if (types.isSubtype(tm, type_IProvider.asType())) {
+                            for (TypeMirror typeMirror : interfaces) {
+                                if (types.isSubtype(typeMirror, type_IProvider.asType())) {
                                     // This interface extend the IProvider, so it can be used for mark provider
                                     loadIntoMethodOfProviderBuilder.addStatement(
                                             "providers.put($S, $T.build($T." + metadata.getType() + ", $T.class, $S, $S, null, " + metadata.getPriority() + ", " + metadata.getExtra() + "))",
-                                            tm.toString().substring(tm.toString().lastIndexOf(".") + 1),    // Spite unuseless name
-                                            RouteMetadataCn,
+                                            typeMirror.toString().substring(typeMirror.toString().lastIndexOf(".") + 1),    // Spite unuseless name
+                                            routeMetadataCn,
                                             routeTypeCn,
                                             ClassName.get((TypeElement) metadata.getRawType()),
                                             metadata.getPath(),
@@ -232,12 +230,11 @@ public class RouteProcessor extends AbstractProcessor {
                             builder.append("put(\"").append(types.getKey()).append("\", ").append(types.getValue()).append("); ");
                         }
                     }
-                    String mapBody = builder.toString();
 
                     loadIntoMethodOfGroupBuilder.addStatement(
-                            "atlas.put($S, $T.build($T." + metadata.getType() + ", $T.class, $S, $S, " + (StringUtils.isEmpty(mapBody) ? null : ("new java.util.HashMap<String, Integer>(){{" + builder.toString() + "}}")) + ", " + metadata.getPriority() + ", " + metadata.getExtra() + "))",
+                            "atlas.put($S, $T.build($T." + metadata.getType() + ", $T.class, $S, $S, " + (StringUtils.isEmpty(builder.toString()) ? null : ("new java.util.HashMap<String, Integer>(){{" + builder.toString() + "}}")) + ", " + metadata.getPriority() + ", " + metadata.getExtra() + "))",
                             metadata.getPath(),
-                            RouteMetadataCn,
+                            routeMetadataCn,
                             routeTypeCn,
                             ClassName.get((TypeElement) metadata.getRawType()),
                             metadata.getPath().toLowerCase(),
@@ -284,7 +281,7 @@ public class RouteProcessor extends AbstractProcessor {
             JavaFile.builder(Constant.PACKAGE_OF_GENERATE_FILE,
                              TypeSpec.classBuilder(rootFileName)
                                      .addJavadoc(Constant.WARNING_TIPS)
-                                     .addSuperinterface(ClassName.get(elements.getTypeElement(Constant.ITROUTE_ROOT)))
+                                     .addSuperinterface(ClassName.get(elements.getTypeElement(Constant.IROUTE_ROOT)))
                                      .addModifiers(PUBLIC)
                                      .addMethod(loadIntoMethodOfRootBuilder.build())
                                      .build()
@@ -294,11 +291,11 @@ public class RouteProcessor extends AbstractProcessor {
         }
     }
 
-    private void categories(RouteMetadata routeMete) {
-        if (routeVerify(routeMete)) {
-            messager.info(">>> Start categories, group = " + routeMete.getGroup() + ", path = " + routeMete.getPath() + " <<<");
-            Set<RouteMetadata> RouteMetadatas = groupMap.get(routeMete.getGroup());
-            if (CollectionUtils.isEmpty(RouteMetadatas)) {
+    private void categories(RouteMetadata routeMetadata) {
+        if (routeVerify(routeMetadata)) {
+            messager.info(">>> Start categories, group = " + routeMetadata.getGroup() + ", path = " + routeMetadata.getPath() + " <<<");
+            Set<RouteMetadata> routeMetadatas = groupMap.get(routeMetadata.getGroup());
+            if (CollectionUtils.isEmpty(routeMetadatas)) {
                 Set<RouteMetadata> RouteMetadataSet = new TreeSet<>(new Comparator<RouteMetadata>() {
                     @Override
                     public int compare(RouteMetadata r1, RouteMetadata r2) {
@@ -310,28 +307,28 @@ public class RouteProcessor extends AbstractProcessor {
                         }
                     }
                 });
-                RouteMetadataSet.add(routeMete);
-                groupMap.put(routeMete.getGroup(), RouteMetadataSet);
+                RouteMetadataSet.add(routeMetadata);
+                groupMap.put(routeMetadata.getGroup(), RouteMetadataSet);
             } else {
-                RouteMetadatas.add(routeMete);
+                routeMetadatas.add(routeMetadata);
             }
         } else {
-            messager.warning(">>> Route meta verify error, group is " + routeMete.getGroup() + " <<<");
+            messager.warning(">>> Route meta verify error, group is " + routeMetadata.getGroup() + " <<<");
         }
     }
 
-    private boolean routeVerify(RouteMetadata meta) {
-        String path = meta.getPath();
+    private boolean routeVerify(RouteMetadata routeMetadata) {
+        String path = routeMetadata.getPath();
         if (StringUtils.isEmpty(path) || !path.startsWith("/")) {   // The path must be start with '/' and not empty!
             return false;
         }
-        if (StringUtils.isEmpty(meta.getGroup())) { // Use default group(the first word in path)
+        if (StringUtils.isEmpty(routeMetadata.getGroup())) { // Use default group(the first word in path)
             try {
                 String defaultGroup = path.substring(1, path.indexOf("/", 1));
                 if (StringUtils.isEmpty(defaultGroup)) {
                     return false;
                 }
-                meta.setGroup(defaultGroup);
+                routeMetadata.setGroup(defaultGroup);
                 return true;
             } catch (StringIndexOutOfBoundsException e) {
                 messager.error("Failed to extract default group! " + e.getMessage());
@@ -339,30 +336,5 @@ public class RouteProcessor extends AbstractProcessor {
             }
         }
         return true;
-    }
-
-    private int exchange(TypeMirror rawType) {
-        if (rawType.getKind().isPrimitive()) {  // is java base type
-            return rawType.getKind().ordinal();
-        }
-        switch (rawType.toString()) {
-            case Constant.BYTE:
-                return TypeKind.BYTE.ordinal();
-            case Constant.SHORT:
-                return TypeKind.SHORT.ordinal();
-            case Constant.INTEGER:
-                return TypeKind.INT.ordinal();
-            case Constant.LONG:
-                return TypeKind.LONG.ordinal();
-            case Constant.FLOAT:
-                return TypeKind.FLOAT.ordinal();
-            case Constant.DOUBEL:
-                return TypeKind.DOUBLE.ordinal();
-            case Constant.BOOLEAN:
-                return TypeKind.BOOLEAN.ordinal();
-            case Constant.STRING:
-            default:
-                return TypeKind.OTHER.ordinal();  // I say it was java.long.String
-        }
     }
 }

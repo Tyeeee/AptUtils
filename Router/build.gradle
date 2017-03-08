@@ -32,6 +32,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ moduleName : project.getName() ]
+            }
+        }
     }
     signingConfigs {
         debug {}
@@ -95,7 +100,9 @@ dependencies {
     testCompile deps.junit
     compile deps.commons_collections4
     compile deps.commons_lang3
-    compile deps.Router_Annotation
+//    compile deps.Router_Annotation
+    compile project(':Router_Annotation')
+    annotationProcessor project(':Router_Compiler')
 }
 
 apply from: "bintray_push.gradle"

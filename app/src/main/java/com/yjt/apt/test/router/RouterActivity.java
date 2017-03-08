@@ -53,7 +53,7 @@ public class RouterActivity extends AppCompatActivity implements View.OnClickLis
                 Router.getInstance().build("/test/router/TestActivity3").putString("url", "file:///android_asset/scheme-test.html").navigation(this);
                 break;
             case R.id.autoInject:
-                Router.getInstance().enableAutoInject();
+//                Router.getInstance().enableAutoInject();
                 break;
             case R.id.interceptor:
                 Router.getInstance().build("/module/TestActivity4").navigation(this, new NavigationCallback() {

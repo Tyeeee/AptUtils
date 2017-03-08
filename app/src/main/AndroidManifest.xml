@@ -27,10 +27,6 @@
         <activity android:name=".test.router.TestActivity2"/>
         <activity android:name=".test.router.TestActivity3"/>
         <activity android:name=".test.router.TestActivity6"/>
-        <activity android:name=".test.router.Activity1"/>
-        <activity android:name=".test.router.Activity2"/>
-        <activity android:name=".test.router.Activity3"/>
-        <activity android:name=".test.router.Activity4"/>
         <activity android:name=".test.router.SchameFilterActivity">
 
             <!-- Schame -->

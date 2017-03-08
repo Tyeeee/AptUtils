@@ -42,10 +42,6 @@
 -keep public class * extends android.preference.Preference        
 -keep public class com.android.vending.licensing.ILicensingService    
 
--keep public class com.yjt.apt.router.Router
--keep public class com.yjt.apt.router.listener.**{*;}
--keep public class com.yjt.apt.router.model.**{*;}
-
 -keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
     native <methods>;
 }
@@ -64,15 +60,4 @@
 }
 -keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆  
     public static final android.os.Parcelable$Creator *;
-}
--keepclassmembers class com.yjt.apt.router.Router { 
-    public static synchronized <methods>;
-    public synchronized <methods>;
-    public void destroy();
-   	public com.yjt.apt.router.model.Postcard build(java.lang.String);
-   	public com.yjt.apt.router.model.Postcard build(android.net.Uri);
-   	public com.yjt.apt.router.model.Postcard build(java.lang.String, java.lang.String);
-   	public java.lang.Class navigation(java.lang.Class);
-   	public java.lang.Object navigation(android.content.Context, com.yjt.apt.router.model.Postcard, int, com.yjt.apt.router.listener.callback.NavigationCallback);
-   	public java.lang.Object navigation(android.content.Context, com.yjt.apt.router.model.Postcard, int);
 }

@@ -8,6 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Router" />
+            <option value="$PROJECT_DIR$/Router_Annotation" />
+            <option value="$PROJECT_DIR$/Router_Compiler" />
             <option value="$PROJECT_DIR$/TestModule" />
             <option value="$PROJECT_DIR$/app" />
           </set>

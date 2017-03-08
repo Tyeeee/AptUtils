@@ -5,23 +5,23 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.yjt.apt.R;
-import com.yjt.apt.router.annotation.Parameter;
+import com.yjt.apt.router.annotation.Autowired;
 import com.yjt.apt.router.annotation.Route;
 
 @Route(path = "/test/router/TestActivity6")
 public class TestActivity6 extends Activity {
 
-    @Parameter
-    private String name;
-    @Parameter
-    private int age;
-    @Parameter(name = "boy")
-    private boolean girl;
+    @Autowired
+    String name;
+    @Autowired
+    int age;
+    @Autowired(name = "boy")
+    boolean girl;
     private long high;
-    @Parameter
-    private String url;
-    @Parameter
-    private String key;
+    @Autowired
+    String url;
+    @Autowired
+    String key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

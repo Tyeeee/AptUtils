@@ -59,7 +59,7 @@ public class DefaultThreadPoolExecutor extends ThreadPoolExecutor {
             }
         }
         if (throwable != null) {
-            DebugUtil.getInstance().warning(Constant.TAG, "Running task appeared exception! Thread [" + Thread.currentThread().getName() + "], because [" + throwable.getMessage() + "]\n" + StringUtil.getInstance().formatStackTrace(throwable.getStackTrace()));
+            DebugUtil.getInstance().error(Constant.TAG, "Running task appeared exception! Thread [" + Thread.currentThread().getName() + "], because [" + throwable.getMessage() + "]\n" + StringUtil.getInstance().formatStackTrace(throwable.getStackTrace()));
         }
     }
 }

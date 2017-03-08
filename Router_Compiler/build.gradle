@@ -1,7 +1,9 @@
 apply plugin: 'java'
 
-sourceCompatibility = rootProject.ext.sourceCompatibilityVersion
-targetCompatibility = rootProject.ext.targetCompatibilityVersion
+compileJava {
+    sourceCompatibility = rootProject.ext.sourceCompatibilityVersion
+    targetCompatibility = rootProject.ext.targetCompatibilityVersion
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -9,7 +11,8 @@ dependencies {
     compile deps.javapoet
     compile deps.commons_collections4
     compile deps.commons_lang3
-    compile deps.Router_Annotation
+//    compile deps.Router_Annotation
+    compile project(':Router_Annotation')
 }
 
 apply from: "bintray_push.gradle"

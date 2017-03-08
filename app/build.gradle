@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 def releaseProperties() {
     def propFile = file('keystore.properties')
@@ -33,6 +32,11 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ moduleName : project.getName() ]
+            }
+        }
     }
     signingConfigs {
         debug {
@@ -47,14 +51,16 @@ android {
     }
     buildTypes {
         debug {
+            debuggable true
             minifyEnabled false
             zipAlignEnabled false
             shrinkResources false
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled true
-//            minifyEnabled false
+            debuggable false
+//            minifyEnabled true
+            minifyEnabled false
             zipAlignEnabled true
             shrinkResources false
             signingConfig signingConfigs.release
@@ -97,26 +103,18 @@ dependencies {
     compile deps.design
     testCompile deps.junit
     
-    compile deps.commons_collections4
-    compile deps.commons_lang3
+//    compile deps.commons_collections4
+//    compile deps.commons_lang3
     
-    compile deps.Router
-    apt deps.Router_Compiler
+//    compile deps.Router
 //    annotationProcessor deps.Router_Compiler
-    compile deps.Router_Annotation
+//    compile deps.Router_Annotation
 
-//    compile project(':Router')
-//    apt project(':Router_Compiler')
-//    compile(name: 'Router', ext: 'aar')
-//    compile project(':TestModule')
+    compile project(':Router')
+    annotationProcessor project(':Router_Compiler')
+    compile project(':TestModule')
 
 //    compile project(':SharedPreferences')
 //    apt project(':SharedPreferences_Compiler')
 }
 
-
-apt {
-    arguments {
-        moduleName project.getName();
-    }
-}

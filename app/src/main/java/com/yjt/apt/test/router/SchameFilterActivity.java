@@ -15,10 +15,10 @@ public class SchameFilterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        直接通过ARouter处理外部Uri
+//        直接通过Router处理外部Uri
         Uri uri = getIntent().getData();
         Router.getInstance().build(uri).navigation(this, new NavigationCallback() {
-            
+
             @Override
             public void onFound(Postcard postcard) {
                 finish();

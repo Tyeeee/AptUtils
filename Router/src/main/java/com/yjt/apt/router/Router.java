@@ -5,17 +5,17 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.yjt.apt.router.constant.Constant;
-import com.yjt.apt.router.core.InstrumentationHook;
 import com.yjt.apt.router.core.LogisticsCenter;
 import com.yjt.apt.router.exception.MainProcessException;
 import com.yjt.apt.router.exception.RouteNotFoundException;
 import com.yjt.apt.router.listener.callback.InterceptorCallback;
 import com.yjt.apt.router.listener.callback.NavigationCallback;
+import com.yjt.apt.router.listener.service.AutowiredService;
 import com.yjt.apt.router.listener.service.DegradeService;
+import com.yjt.apt.router.listener.service.InterceptorService;
 import com.yjt.apt.router.listener.service.PathReplaceService;
 import com.yjt.apt.router.model.Postcard;
 import com.yjt.apt.router.thread.DefaultThreadPoolExecutor;
@@ -23,20 +23,15 @@ import com.yjt.apt.router.utils.DebugUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.ThreadPoolExecutor;
-
 public final class Router {
 
     private volatile boolean monitorMode;
     private volatile boolean debuggable;
-    private volatile boolean autoInject;
     private volatile static Router instance;
     private volatile static boolean hasInitialized;
-    private volatile static ThreadPoolExecutor executor = DefaultThreadPoolExecutor.getInstance();
+    //    private volatile static ThreadPoolExecutor executor = DefaultThreadPoolExecutor.getInstance();
     private static Context context;
+    private static InterceptorService interceptorService;
 
     private Router() {
         // cannot be instantiated
@@ -66,10 +61,10 @@ public final class Router {
         if (!hasInitialized) {
             DebugUtil.getInstance().info(Constant.TAG, "Router initialize start.");
             context = application;
-            LogisticsCenter.getInstance().initialize(context, executor);
+            LogisticsCenter.getInstance().initialize(context, DefaultThreadPoolExecutor.getInstance());
             DebugUtil.getInstance().info(Constant.TAG, "Router initialize success!");
             hasInitialized = true;
-            LogisticsCenter.getInstance().initializeInterceptors();
+            interceptorService = (InterceptorService) build("/router/service/interceptor").navigation(context);
             DebugUtil.getInstance().info(Constant.TAG, "Router initialize over.");
         } else {
             DebugUtil.getInstance().info(Constant.TAG, "Router has been initialized.");
@@ -97,33 +92,10 @@ public final class Router {
         DebugUtil.getInstance().info(Constant.TAG, "Router openLog");
     }
 
-    public synchronized void enableAutoInject() {
-        autoInject = true;
-    }
-
-    public boolean canAutoInject() {
-        return autoInject;
-    }
-
-    public void attachBaseContext() {
-        Log.i(Constant.TAG, "Router start attachBaseContext");
-        try {
-            Class<?> mMainThreadClass = Class.forName("android.app.ActivityThread");
-
-            // Get current main thread.
-            Method getMainThread = mMainThreadClass.getDeclaredMethod("currentActivityThread");
-            getMainThread.setAccessible(true);
-            Object currentActivityThread = getMainThread.invoke(null);
-
-            // The field contain instrumentation.
-            Field mInstrumentationField = mMainThreadClass.getDeclaredField("mInstrumentation");
-            mInstrumentationField.setAccessible(true);
-
-            // Hook current instrumentation
-            mInstrumentationField.set(currentActivityThread, new InstrumentationHook());
-            Log.i(Constant.TAG, "Router hook instrumentation success!");
-        } catch (InvocationTargetException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException | ClassNotFoundException e) {
-            Log.e(Constant.TAG, "Router hook instrumentation failed! [" + e.getMessage() + "]");
+    public void inject(Object object) {
+        AutowiredService autowiredService = ((AutowiredService) build("/router/service/autowired").navigation(context));
+        if (null != autowiredService) {
+            autowiredService.autowire(object);
         }
     }
 
@@ -132,13 +104,13 @@ public final class Router {
         DebugUtil.getInstance().info(Constant.TAG, "Router printStackTrace");
     }
 
-    synchronized void setExecutor(ThreadPoolExecutor tpe) {
-        executor = tpe;
-    }
+//    synchronized void setExecutor(ThreadPoolExecutor tpe) {
+//        executor = tpe;
+//    }
 
-    synchronized void monitorMode() {
+    synchronized void setMonitorMode() {
         monitorMode = true;
-        DebugUtil.getInstance().info(Constant.TAG, "Router monitorMode on");
+        DebugUtil.getInstance().info(Constant.TAG, "Router setMonitorMode on");
     }
 
     boolean isMonitorMode() {
@@ -181,6 +153,8 @@ public final class Router {
             if (null != service) {
                 path = service.forString(path);
             }
+            DebugUtil.getInstance().info(Constant.TAG, path);
+            DebugUtil.getInstance().info(Constant.TAG, group);
             return new Postcard(path, group);
         }
     }
@@ -191,13 +165,14 @@ public final class Router {
         }
         try {
             String defaultGroup = path.substring(1, path.indexOf("/", 1));
+            DebugUtil.getInstance().info(Constant.TAG, defaultGroup);
             if (StringUtils.isEmpty(defaultGroup)) {
                 throw new MainProcessException(Constant.TAG + "Extract the default group failed! There's nothing between 2 '/'!");
             } else {
                 return defaultGroup;
             }
         } catch (StringIndexOutOfBoundsException e) {
-            DebugUtil.getInstance().warning(Constant.TAG, "Failed to extract default group! " + e.getMessage());
+            DebugUtil.getInstance().error(Constant.TAG, "Failed to extract default group! " + e.getMessage());
             return null;
         }
     }
@@ -208,7 +183,7 @@ public final class Router {
             LogisticsCenter.getInstance().completion(postcard);
             return (T) postcard.getProvider();
         } catch (RouteNotFoundException ex) {
-            DebugUtil.getInstance().warning(Constant.TAG, ex.getMessage());
+            DebugUtil.getInstance().error(Constant.TAG, ex.getMessage());
             return null;
         }
     }
@@ -216,8 +191,8 @@ public final class Router {
     public Object navigation(final Context ctx, final Postcard postcard, final int requestCode, NavigationCallback callback) {
         try {
             LogisticsCenter.getInstance().completion(postcard);
-        } catch (RouteNotFoundException ex) {
-            DebugUtil.getInstance().warning(Constant.TAG, ex.getMessage());
+        } catch (RouteNotFoundException e) {
+            DebugUtil.getInstance().error(Constant.TAG, e.getMessage());
             if (debuggable) { // Show friendly tips for user.
                 Toast.makeText(ctx, "There's no route matched!\n" +
                         " Path = [" + postcard.getPath() + "]\n" +
@@ -239,7 +214,7 @@ public final class Router {
         }
 
         if (!postcard.isGreenChannal()) {   // It must be run in async thread, maybe interceptor cost too mush time made ANR.
-            LogisticsCenter.getInstance().intercept(postcard, new InterceptorCallback() {
+            interceptorService.intercept(postcard, new InterceptorCallback() {
 
                 @Override
                 public void onContinue(Postcard postcard) {

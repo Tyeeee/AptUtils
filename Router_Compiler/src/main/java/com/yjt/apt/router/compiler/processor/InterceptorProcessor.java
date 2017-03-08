@@ -1,4 +1,4 @@
-package com.yjt.apt.router.compiler;
+package com.yjt.apt.router.compiler.processor;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Sets;
@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -31,12 +32,14 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 
 import static javax.lang.model.element.Modifier.PUBLIC;
 
 @AutoService(Processor.class)
+//@SupportedOptions(Constant.KEY_MODULE_NAME)
+//@SupportedSourceVersion(SourceVersion.RELEASE_7)
+//@SupportedAnnotationTypes(Constant.ANNOTATION_TYPE_INTECEPTOR)
 public class InterceptorProcessor extends AbstractProcessor {
 
     private Map<Integer, Element> interceptors = new TreeMap<>();
@@ -44,7 +47,6 @@ public class InterceptorProcessor extends AbstractProcessor {
     private Filer filer;       // File util, write class file into disk.
     private Messager messager;
     private String moduleName;   // Module name, maybe its 'app' or others
-    private TypeMirror typeMirror;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -70,9 +72,8 @@ public class InterceptorProcessor extends AbstractProcessor {
                                    "        moduleName project.getName();\n" +
                                    "    }\n" +
                                    "}\n");
-            throw new RuntimeException("Router::Compiler >>> No module name, for more information, look at gradle log.");
+            throw new RuntimeException("Router_InterceptorProcessor::Compiler >>> No module name, for more information, look at gradle log.");
         }
-        typeMirror = elements.getTypeElement(Constant.IINTERCEPTOR).asType();
         messager.info(">>> InterceptorProcessor init. <<<");
     }
 
@@ -93,15 +94,16 @@ public class InterceptorProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Interceptor.class);
-        boolean parseResult = false;
-        try {
-            parseInterceptors(elements);
-            parseResult = true;
-        } catch (IOException e) {
-            messager.error(e);
+        if (CollectionUtils.isNotEmpty(annotations)) {
+            try {
+                messager.info(">>> Found routes, start... <<<");
+                parseInterceptors(roundEnv.getElementsAnnotatedWith(Interceptor.class));
+            } catch (IOException e) {
+                messager.error(e);
+            }
+            return true;
         }
-        return parseResult;
+        return false;
     }
 
     private void parseInterceptors(Set<? extends Element> elements) throws IOException {
@@ -113,11 +115,16 @@ public class InterceptorProcessor extends AbstractProcessor {
                 if (verify(element)) {  // Check the interceptor meta
                     messager.info("A interceptor verify over, its " + element.asType());
                     Interceptor interceptor = element.getAnnotation(Interceptor.class);
+                    Element lastInterceptor = interceptors.get(interceptor.priority());
+                    if (null != lastInterceptor) { // Added, throw exceptions
+                        throw new IllegalArgumentException(
+                                String.format(Locale.getDefault(), "More than one interceptors use same priority [%d], They are [%s] and [%s].",
+                                              interceptor.priority(),
+                                              lastInterceptor.getSimpleName(),
+                                              element.getSimpleName())
+                        );
+                    }
                     interceptors.put(interceptor.priority(), element);
-
-//                    if (StringUtils.isEmpty(moduleName)) {   // Hasn't generate the module name.
-//                        moduleName = ModuleUtils.generateModuleName(element, messager);
-//                    }
                 } else {
                     messager.error("A interceptor verify failed, its " + element.asType());
                 }
@@ -162,13 +169,12 @@ public class InterceptorProcessor extends AbstractProcessor {
                                      .addSuperinterface(ClassName.get(type_ITollgateGroup))
                                      .build()
             ).build().writeTo(filer);
-
             messager.info(">>> Interceptor group write over. <<<");
         }
     }
 
     private boolean verify(Element element) {
         // It must be implement the interface IInterceptor and marked with annotation Interceptor.
-        return null != element.getAnnotation(Interceptor.class) && ((TypeElement) element).getInterfaces().contains(typeMirror);
+        return null != element.getAnnotation(Interceptor.class) && ((TypeElement) element).getInterfaces().contains(elements.getTypeElement(Constant.IINTERCEPTOR).asType());
     }
 }

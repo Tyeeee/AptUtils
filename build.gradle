@@ -5,11 +5,10 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -18,15 +17,15 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        flatDir {
-            dirs 'libs'
-        }
+//        flatDir {
+//            dirs 'libs'
+//        }
     }
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        }
-    }
+//    gradle.projectsEvaluated {
+//        tasks.withType(JavaCompile) {
+//            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//        }
+//    }
 }
 
 ext {
@@ -50,8 +49,6 @@ ext.deps = [
         Router              : 'com.yjt.apt:Router:0.0.4',
         Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.3',
         Router_Compiler     : 'com.yjt.apt:Router_Compiler:0.0.3'
-//        bintray.user=crazy-ann
-//        bintray.apikey=29965b96525a9e1afedc6c67882d2b080e71c5ed
 ]
 
 task clean(type: Delete) {

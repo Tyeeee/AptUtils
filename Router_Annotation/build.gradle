@@ -1,7 +1,9 @@
 apply plugin: 'java'
 
-sourceCompatibility = rootProject.ext.sourceCompatibilityVersion
-targetCompatibility = rootProject.ext.targetCompatibilityVersion
+compileJava {
+    sourceCompatibility = rootProject.ext.sourceCompatibilityVersion
+    targetCompatibility = rootProject.ext.targetCompatibilityVersion
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
