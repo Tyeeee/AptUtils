@@ -1,7 +1,6 @@
 package com.yjt.apt.router.compiler.processor;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -24,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +34,9 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
+import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -46,9 +47,9 @@ import javax.lang.model.util.Types;
 import static javax.lang.model.element.Modifier.PUBLIC;
 
 @AutoService(Processor.class)
-//@SupportedOptions(Constant.KEY_MODULE_NAME)
-//@SupportedSourceVersion(SourceVersion.RELEASE_7)
-//@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_ROUTE, Constant.ANNOTATION_TYPE_AUTOWIRED})
+@SupportedOptions(Constant.KEY_MODULE_NAME)
+@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_ROUTE, Constant.ANNOTATION_TYPE_AUTOWIRED})
 public class RouteProcessor extends AbstractProcessor {
 
     private Map<String, Set<RouteMetadata>> groupMap = new HashMap<>(); // ModuleName and RouteMetadata.
@@ -86,23 +87,23 @@ public class RouteProcessor extends AbstractProcessor {
         messager.info(">>> RouteProcessor init. <<<");
     }
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-        Set<String> supportAnnotations = new HashSet<>();
-        supportAnnotations.add(Route.class.getCanonicalName());     // This annotation mark class which can be router.
-        supportAnnotations.add(Autowired.class.getCanonicalName());     // This annotation mark class which can be router.
-        return supportAnnotations;
-    }
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
-    }
-
-    @Override
-    public Set<String> getSupportedOptions() {
-        return Sets.newHashSet(Constant.KEY_MODULE_NAME);
-    }
+//    @Override
+//    public Set<String> getSupportedAnnotationTypes() {
+//        Set<String> supportAnnotations = new HashSet<>();
+//        supportAnnotations.add(Route.class.getCanonicalName());     // This annotation mark class which can be router.
+//        supportAnnotations.add(Autowired.class.getCanonicalName());     // This annotation mark class which can be router.
+//        return supportAnnotations;
+//    }
+//
+//    @Override
+//    public SourceVersion getSupportedSourceVersion() {
+//        return SourceVersion.latestSupported();
+//    }
+//
+//    @Override
+//    public Set<String> getSupportedOptions() {
+//        return Sets.newHashSet(Constant.KEY_MODULE_NAME);
+//    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {

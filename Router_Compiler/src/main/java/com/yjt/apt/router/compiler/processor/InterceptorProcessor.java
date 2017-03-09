@@ -1,7 +1,6 @@
 package com.yjt.apt.router.compiler.processor;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -18,7 +17,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +27,9 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
+import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -37,9 +38,9 @@ import javax.lang.model.util.Elements;
 import static javax.lang.model.element.Modifier.PUBLIC;
 
 @AutoService(Processor.class)
-//@SupportedOptions(Constant.KEY_MODULE_NAME)
-//@SupportedSourceVersion(SourceVersion.RELEASE_7)
-//@SupportedAnnotationTypes(Constant.ANNOTATION_TYPE_INTECEPTOR)
+@SupportedOptions(Constant.KEY_MODULE_NAME)
+@SupportedSourceVersion(SourceVersion.RELEASE_7)
+@SupportedAnnotationTypes(Constant.ANNOTATION_TYPE_INTECEPTOR)
 public class InterceptorProcessor extends AbstractProcessor {
 
     private Map<Integer, Element> interceptors = new TreeMap<>();
@@ -77,20 +78,20 @@ public class InterceptorProcessor extends AbstractProcessor {
         messager.info(">>> InterceptorProcessor init. <<<");
     }
 
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-        return Collections.singleton(Interceptor.class.getCanonicalName());
-    }
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.latestSupported();
-    }
-
-    @Override
-    public Set<String> getSupportedOptions() {
-        return Sets.newHashSet(Constant.KEY_MODULE_NAME);
-    }
+//    @Override
+//    public Set<String> getSupportedAnnotationTypes() {
+//        return Collections.singleton(Interceptor.class.getCanonicalName());
+//    }
+//
+//    @Override
+//    public SourceVersion getSupportedSourceVersion() {
+//        return SourceVersion.latestSupported();
+//    }
+//
+//    @Override
+//    public Set<String> getSupportedOptions() {
+//        return Sets.newHashSet(Constant.KEY_MODULE_NAME);
+//    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
