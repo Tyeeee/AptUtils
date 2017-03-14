@@ -102,9 +102,8 @@ dependencies {
     compile deps.appcompat_v7
     compile deps.design
     testCompile deps.junit
-    
-//    compile deps.commons_collections4
-//    compile deps.commons_lang3
+
+    compile deps.libsuperuser
     
 //    compile deps.Router
 //    annotationProcessor deps.Router_Compiler

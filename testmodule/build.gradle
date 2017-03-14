@@ -97,8 +97,8 @@ dependencies {
     })
     compile deps.appcompat_v7
     testCompile deps.junit
-    compile project(':Router')
-    annotationProcessor project(':Router_Compiler')
-//    compile deps.Router
-//    annotationProcessor deps.Router_Compiler
+//    compile project(':Router')
+//    annotationProcessor project(':Router_Compiler')
+    compile deps.Router
+    annotationProcessor deps.Router_Compiler
 }
