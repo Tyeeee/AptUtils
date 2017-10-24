@@ -11,6 +11,8 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.chainfire.libsuperuser.Shell;
+
 public class ProcessUtil {
 
     private static final String TAG = "ProcessManager";

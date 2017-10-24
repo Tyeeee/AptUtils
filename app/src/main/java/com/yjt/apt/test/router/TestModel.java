@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class TestModel implements Parcelable {
-
+    
     private String name;
     private int length;
     private int width;

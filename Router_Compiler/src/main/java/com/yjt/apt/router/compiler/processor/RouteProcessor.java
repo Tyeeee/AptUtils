@@ -8,7 +8,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.WildcardTypeName;
-import com.yjt.apt.router.annotation.Autowired;
+import com.yjt.apt.router.annotation.Autowire;
 import com.yjt.apt.router.annotation.Route;
 import com.yjt.apt.router.annotation.constant.RouteType;
 import com.yjt.apt.router.annotation.model.RouteMetadata;
@@ -49,7 +49,7 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 @AutoService(Processor.class)
 @SupportedOptions(Constant.KEY_MODULE_NAME)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_ROUTE, Constant.ANNOTATION_TYPE_AUTOWIRED})
+@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_ROUTE, Constant.ANNOTATION_TYPE_AUTOWIRE})
 public class RouteProcessor extends AbstractProcessor {
 
     private Map<String, Set<RouteMetadata>> groupMap = new HashMap<>(); // ModuleName and RouteMetadata.
@@ -91,7 +91,7 @@ public class RouteProcessor extends AbstractProcessor {
 //    public Set<String> getSupportedAnnotationTypes() {
 //        Set<String> supportAnnotations = new HashSet<>();
 //        supportAnnotations.add(Route.class.getCanonicalName());     // This annotation mark class which can be router.
-//        supportAnnotations.add(Autowired.class.getCanonicalName());     // This annotation mark class which can be router.
+//        supportAnnotations.add(Autowire.class.getCanonicalName());     // This annotation mark class which can be router.
 //        return supportAnnotations;
 //    }
 //
@@ -167,11 +167,11 @@ public class RouteProcessor extends AbstractProcessor {
                 if (types.isSubtype(typeMirror, type_Activity.asType())) {// Activity
                     messager.info(">>> Found activity route: " + typeMirror.toString() + " <<<");
 
-                    // Get all fields annotation by @Autowired
+                    // Get all fields annotation by @Autowire
                     Map<String, Integer> parametersType = new HashMap<>();
                     for (Element field : element.getEnclosedElements()) {
-                        if (field.getKind().isField() && field.getAnnotation(Autowired.class) != null && !types.isSubtype(field.asType(), type_IProvider.asType())) {
-                            Autowired parameterConfig = field.getAnnotation(Autowired.class);
+                        if (field.getKind().isField() && field.getAnnotation(Autowire.class) != null && !types.isSubtype(field.asType(), type_IProvider.asType())) {
+                            Autowire parameterConfig = field.getAnnotation(Autowire.class);
                             parametersType.put(StringUtils.isEmpty(parameterConfig.name()) ? field.getSimpleName().toString() : field.getSimpleName().toString() + "|" + parameterConfig.name(), TypeUtil.typeExchange(field.asType()));
                         }
                     }

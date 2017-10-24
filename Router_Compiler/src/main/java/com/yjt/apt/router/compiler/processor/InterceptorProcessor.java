@@ -52,17 +52,14 @@ public class InterceptorProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-
         filer = processingEnv.getFiler();                  // Generate class.
         elements = processingEnv.getElementUtils();      // Get class meta.
         messager = new Messager(processingEnv.getMessager());   // Package the log utils.
-
         // Attempt to get user configuration [moduleName]
         Map<String, String> options = processingEnv.getOptions();
         if (MapUtils.isNotEmpty(options)) {
             moduleName = options.get(Constant.KEY_MODULE_NAME);
         }
-
         if (StringUtils.isNotEmpty(moduleName)) {
             moduleName = moduleName.replaceAll("[^0-9a-zA-Z_]+", "");
             messager.info("The user has configuration the module name, it was [" + moduleName + "]");

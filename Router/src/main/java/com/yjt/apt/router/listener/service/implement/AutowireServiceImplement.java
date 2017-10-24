@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.yjt.apt.router.annotation.Route;
 import com.yjt.apt.router.constant.Constant;
-import com.yjt.apt.router.listener.service.AutowiredService;
+import com.yjt.apt.router.listener.service.AutowireService;
 import com.yjt.apt.router.listener.template.ISyringe;
 import com.yjt.apt.router.utils.DebugUtil;
 
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Route(path = "/router/service/autowired")
-public class AutowiredServiceImplement implements AutowiredService {
+@Route(path = "/router/service/autowire")
+public class AutowireServiceImplement implements AutowireService {
 
     private Map<String, ISyringe> classCache;
     private List<String> blackList;
@@ -32,16 +32,16 @@ public class AutowiredServiceImplement implements AutowiredService {
         String className = instance.getClass().getName();
         try {
             if (!blackList.contains(className)) {
-                ISyringe autowiredHelper = classCache.get(className);
-                if (null == autowiredHelper) {  // No cache.
-                    autowiredHelper = (ISyringe) Class.forName(instance.getClass().getName() + Constant.SUFFIX_AUTOWIRED).getConstructor().newInstance();
+                ISyringe autowireHelper = classCache.get(className);
+                if (null == autowireHelper) {  // No cache.
+                    autowireHelper = (ISyringe) Class.forName(instance.getClass().getName() + Constant.SUFFIX_AUTOWIRE).getConstructor().newInstance();
                 }
-                autowiredHelper.inject(instance);
-                classCache.put(className, autowiredHelper);
+                autowireHelper.inject(instance);
+                classCache.put(className, autowireHelper);
             }
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException e) {
-            DebugUtil.getInstance().error(Constant.TAG, "Autowired made exception in class [" + className + "]");
-            blackList.add(className);    // This instance need not autowired.
+            DebugUtil.getInstance().error(Constant.TAG, "Autowire made exception in class [" + className + "]");
+            blackList.add(className);    // This instance need not autowire.
         }
     }
 }

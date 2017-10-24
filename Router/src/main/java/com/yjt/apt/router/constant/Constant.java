@@ -2,15 +2,15 @@ package com.yjt.apt.router.constant;
 
 public final class Constant {
 
-    public static final String SDK_NAME = "Router";
-    public static final String TAG = SDK_NAME + "-->";
-    public static final String SEPARATOR = "$$";
-    public static final String SUFFIX_ROOT = "Root";
+    public static final String SDK_NAME            = "Router";
+    public static final String TAG                 = SDK_NAME + "-->";
+    public static final String SEPARATOR           = "$$";
+    public static final String SUFFIX_ROOT         = "Root";
     public static final String SUFFIX_INTERCEPTORS = "Interceptors";
-    public static final String SUFFIX_PROVIDERS = "Providers";
-    public static final String SUFFIX_AUTOWIRED = SEPARATOR + SDK_NAME + SEPARATOR + "Autowired";
-    public static final String DOT = ".";
-    public static final String ROUTE_ROOT_PAKCAGE = "com.yjt.apt.router.routes";
+    public static final String SUFFIX_PROVIDERS    = "Providers";
+    public static final String SUFFIX_AUTOWIRE     = SEPARATOR + SDK_NAME + SEPARATOR + "Autowireh";
+    public static final String DOT                 = ".";
+    public static final String ROUTE_ROOT_PAKCAGE  = "com.yjt.apt.router.routes";
 
     // Java base type, copy from javax 'TypeKind'
     public static final int DEFINE_BOOLEAN = 0;

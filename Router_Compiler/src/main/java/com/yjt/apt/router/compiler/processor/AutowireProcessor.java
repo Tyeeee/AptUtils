@@ -7,7 +7,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.yjt.apt.router.annotation.Autowired;
+import com.yjt.apt.router.annotation.Autowire;
 import com.yjt.apt.router.compiler.constant.Constant;
 import com.yjt.apt.router.compiler.messager.Messager;
 import com.yjt.apt.router.compiler.utils.TypeUtil;
@@ -45,20 +45,20 @@ import static javax.lang.model.element.Modifier.PUBLIC;
 @AutoService(Processor.class)
 @SupportedOptions(Constant.KEY_MODULE_NAME)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
-@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_AUTOWIRED})
-public class AutowiredProcessor extends AbstractProcessor {
+@SupportedAnnotationTypes({Constant.ANNOTATION_TYPE_AUTOWIRE})
+public class AutowireProcessor extends AbstractProcessor {
 
     private Filer filer;       // File util, write class file into disk.
     private Messager messager;
     private Types types;
     private Elements elements;
     private String moduleName;
-    private Map<TypeElement, List<Element>> parentAndChild = new HashMap<>();   // Contain field need autowired and his super class.
+    private Map<TypeElement, List<Element>> parentAndChild = new HashMap<>();   // Contain field need autowire and his super class.
     private static final ClassName ROUTER = ClassName.get("com.yjt.apt.router", "Router");
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnvironment) {
-        super.init(processingEnvironment);
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
         filer = processingEnv.getFiler();                  // Generate class.
         types = processingEnv.getTypeUtils();            // Get type utils.
         elements = processingEnv.getElementUtils();      // Get class meta.
@@ -79,14 +79,14 @@ public class AutowiredProcessor extends AbstractProcessor {
                                    "        moduleName project.getName();\n" +
                                    "    }\n" +
                                    "}\n");
-            throw new RuntimeException("Router_AutowiredProcessor::Compiler >>> No module name, for more information, look at gradle log.");
+            throw new RuntimeException("Router_AutowireProcessor::Compiler >>> No module name, for more information, look at gradle log.");
         }
-        messager.info(">>> AutowiredProcessor init. <<<");
+        messager.info(">>> AutowireProcessor init. <<<");
     }
 
 //    @Override
 //    public Set<String> getSupportedAnnotationTypes() {
-//        return Collections.singleton(Autowired.class.getCanonicalName());
+//        return Collections.singleton(Autowire.class.getCanonicalName());
 //    }
 //
 //    @Override
@@ -103,8 +103,8 @@ public class AutowiredProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         if (CollectionUtils.isNotEmpty(set)) {
             try {
-                messager.info(">>> Found autowired field, start... <<<");
-                categories(roundEnvironment.getElementsAnnotatedWith(Autowired.class));
+                messager.info(">>> Found autowire field, start... <<<");
+                categories(roundEnvironment.getElementsAnnotatedWith(Autowire.class));
                 generateHelper();
             } catch (IOException | IllegalAccessException e) {
                 messager.error(e);
@@ -133,7 +133,7 @@ public class AutowiredProcessor extends AbstractProcessor {
                 List<Element> childs = entry.getValue();
                 String qualifiedName = parent.getQualifiedName().toString();
                 String packageName = qualifiedName.substring(0, qualifiedName.lastIndexOf("."));
-                String fileName = parent.getSimpleName() + Constant.NAME_OF_AUTOWIRED;
+                String fileName = parent.getSimpleName() + Constant.NAME_OF_AUTOWIRE;
 
                 messager.info(">>> Start process " + childs.size() + " field in " + parent.getSimpleName() + " ... <<<");
 
@@ -141,8 +141,8 @@ public class AutowiredProcessor extends AbstractProcessor {
 
                 // Generate method body, start inject.
                 for (Element element : childs) {
-                    Autowired fieldConfig = element.getAnnotation(Autowired.class);
-                    String fieldName = element.getSimpleName().toString();
+                    Autowire fieldConfig = element.getAnnotation(Autowire.class);
+                    String   fieldName   = element.getSimpleName().toString();
                     if (types.isSubtype(element.asType(), iProvider)) {  // It's provider
                         if ("".equals(fieldConfig.name())) {    // User has not set service path, then use byType.
                             // Getter
@@ -176,7 +176,7 @@ public class AutowiredProcessor extends AbstractProcessor {
                         } else if (types.isSubtype(parent.asType(), fragmentTm) || types.isSubtype(parent.asType(), fragmentTmV4)) {   // Fragment, then use getArguments()
                             statment += "getArguments().";
                         } else {
-                            throw new IllegalAccessException("The field [" + fieldName + "] need autowired from intent, its parent must be activity or fragment!");
+                            throw new IllegalAccessException("The field [" + fieldName + "] need autowire from intent, its parent must be activity or fragment!");
                         }
                         statment = buildStatement(statment, TypeUtil.typeExchange(element.asType()), isActivity);
                         injectMethodBuilder.addStatement(statment, StringUtils.isEmpty(fieldConfig.name()) ? fieldName : fieldConfig.name());
@@ -190,7 +190,7 @@ public class AutowiredProcessor extends AbstractProcessor {
                     }
                 }
 
-                // Generate autowired helper
+                // Generate autowire helper
                 JavaFile.builder(packageName,
                                  TypeSpec.classBuilder(fileName)
                                          .addJavadoc(Constant.WARNING_TIPS)
@@ -201,7 +201,7 @@ public class AutowiredProcessor extends AbstractProcessor {
                 ).build().writeTo(filer);
                 messager.info(">>> " + parent.getSimpleName() + " has been processed, " + fileName + " has been generated. <<<");
             }
-            messager.info(">>> Autowired processor stop. <<<");
+            messager.info(">>> Autowire processor stop. <<<");
         }
     }
 
@@ -226,17 +226,12 @@ public class AutowiredProcessor extends AbstractProcessor {
         return statment;
     }
 
-    /**
-     * Categories field, find his papa.
-     *
-     * @param elements Field need autowired
-     */
     private void categories(Set<? extends Element> elements) throws IllegalAccessException {
         if (CollectionUtils.isNotEmpty(elements)) {
             for (Element element : elements) {
                 TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();
                 if (element.getModifiers().contains(Modifier.PRIVATE)) {
-                    throw new IllegalAccessException("The autowired fields CAN NOT BE 'private'!!! please check field ["
+                    throw new IllegalAccessException("The autowire fields CAN NOT BE 'private'!!! please check field ["
                                                              + element.getSimpleName() + "] in class [" + enclosingElement.getQualifiedName() + "]");
                 }
                 if (parentAndChild.containsKey(enclosingElement)) { // Has categries

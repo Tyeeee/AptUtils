@@ -69,10 +69,11 @@ public class RouterActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
                 break;
-            case R.id.startActivityByName:
+            case R.id.startServiceByName:
                 ((TestService) Router.getInstance().build("/service/hello").navigation(this)).hello("袁锦泰");
+//                Router.getInstance().build("//module/TestActivity7").navigation(this);
                 break;
-            case R.id.startActivityByType:
+            case R.id.startServiceByType:
                 Router.getInstance().navigation(TestService.class).hello("袁锦泰");
                 break;
             case R.id.navigateToMoudle1:

@@ -27,7 +27,7 @@
         <activity android:name=".test.router.TestActivity2"/>
         <activity android:name=".test.router.TestActivity3"/>
         <activity android:name=".test.router.TestActivity6"/>
-        <activity android:name=".test.router.SchameFilterActivity">
+        <activity android:name=".test.router.SchemeFilterActivity">
 
             <!-- Schame -->
             <intent-filter>
@@ -54,6 +54,7 @@
                     android:scheme="https"/>
             </intent-filter>
         </activity>
+        <activity android:name=".test.router.TestActivity7"/>
     </application>
 
 </manifest>

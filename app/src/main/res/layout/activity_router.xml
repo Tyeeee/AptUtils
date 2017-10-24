@@ -122,13 +122,13 @@
                 android:padding="5dp"
                 android:text="服务管理(请先初始化)"/>
             <Button
-                android:id="@+id/startActivityByName"
+                android:id="@+id/startServiceByName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
                 android:text="By-Name调用服务"/>
             <Button
-                android:id="@+id/startActivityByType"
+                android:id="@+id/startServiceByType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"

@@ -9,7 +9,7 @@ import com.yjt.apt.router.listener.callback.NavigationCallback;
 import com.yjt.apt.router.model.Postcard;
 
 
-public class SchameFilterActivity extends Activity {
+public class SchemeFilterActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -3,11 +3,12 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:3.0.0-rc2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -20,6 +21,7 @@ allprojects {
 //        flatDir {
 //            dirs 'libs'
 //        }
+        google()
     }
 //    gradle.projectsEvaluated {
 //        tasks.withType(JavaCompile) {
@@ -30,26 +32,26 @@ allprojects {
 
 ext {
     minSdkVersion = 19
-    targetSdkVersion = 25
-    compileSdkVersion = 25
-    buildToolsVersion = "25.0.2"
+    targetSdkVersion = 26
+    compileSdkVersion = 26
+    buildToolsVersion = "26.0.2"
     sourceCompatibilityVersion = JavaVersion.VERSION_1_7
     targetCompatibilityVersion = JavaVersion.VERSION_1_7
 }
 
 ext.deps = [
-        appcompat_v7        : 'com.android.support:appcompat-v7:25.1.0',
-        design              : 'com.android.support:design:25.1.0',
+        appcompat_v7        : 'com.android.support:appcompat-v7:26.1.0',
+        design              : 'com.android.support:design:26.1.0',
         junit               : 'junit:junit:4.12',
         commons_collections4: 'org.apache.commons:commons-collections4:4.1',
         commons_lang3       : 'org.apache.commons:commons-lang3:3.5',
-        auto_service        : 'com.google.auto.service:auto-service:1.0-rc2',
+        auto_service        : 'com.google.auto.service:auto-service:1.0-rc3',
         javapoet            : 'com.squareup:javapoet:1.8.0',
         libsuperuser        : 'eu.chainfire:libsuperuser:1.0.0+',
 
-        Router              : 'com.yjt.apt:Router:0.0.5',
-        Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.5',
-        Router_Compiler     : 'com.yjt.apt:Router_Compiler:0.0.5'
+//        Router              : 'com.yjt.apt:Router:0.0.5',
+//        Router_Annotation   : 'com.yjt.apt:Router_Annotation:0.0.5',
+//        Router_Compiler     : 'com.yjt.apt:Router_Compiler:0.0.5'
 ]
 
 task clean(type: Delete) {

@@ -7,6 +7,7 @@ import android.net.Uri;
 import com.yjt.apt.router.annotation.model.RouteMetadata;
 import com.yjt.apt.router.constant.Constant;
 import com.yjt.apt.router.constant.Warehouse;
+import com.yjt.apt.router.exception.InitializedException;
 import com.yjt.apt.router.exception.MainProcessException;
 import com.yjt.apt.router.exception.RouteNotFoundException;
 import com.yjt.apt.router.listener.template.IInterceptorGroup;
@@ -51,7 +52,7 @@ public class LogisticsCenter {
         }
     }
 
-    public synchronized void initialize(Context ctx, ThreadPoolExecutor executor) throws MainProcessException {
+    public synchronized void initialize(Context ctx, ThreadPoolExecutor executor) {
         this.context = ctx;
         this.executor = executor;
         try {
@@ -74,7 +75,7 @@ public class LogisticsCenter {
             }
             DebugUtil.getInstance().debug(Constant.TAG, String.format(Locale.getDefault(), "LogisticsCenter has already been loaded, GroupIndex[%d], InterceptorIndex[%d], ProviderIndex[%d]", Warehouse.groupsIndex.size(), Warehouse.interceptorsIndex.size(), Warehouse.providersIndex.size()));
         } catch (IOException | InstantiationException | NoSuchMethodException | PackageManager.NameNotFoundException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
-            throw new MainProcessException(Constant.TAG + "Router initialize atlas exception! [" + e.getMessage() + "]");
+            throw new InitializedException(Constant.TAG + "Router initialize atlas exception! [" + e.getMessage() + "]");
         }
     }
 

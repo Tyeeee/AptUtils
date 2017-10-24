@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.yjt.apt.router.constant.Constant;
@@ -13,15 +14,13 @@ import com.yjt.apt.router.exception.MainProcessException;
 import com.yjt.apt.router.exception.RouteNotFoundException;
 import com.yjt.apt.router.listener.callback.InterceptorCallback;
 import com.yjt.apt.router.listener.callback.NavigationCallback;
-import com.yjt.apt.router.listener.service.AutowiredService;
+import com.yjt.apt.router.listener.service.AutowireService;
 import com.yjt.apt.router.listener.service.DegradeService;
 import com.yjt.apt.router.listener.service.InterceptorService;
 import com.yjt.apt.router.listener.service.PathReplaceService;
 import com.yjt.apt.router.model.Postcard;
 import com.yjt.apt.router.thread.DefaultThreadPoolExecutor;
 import com.yjt.apt.router.utils.DebugUtil;
-
-import org.apache.commons.lang3.StringUtils;
 
 public final class Router {
 
@@ -93,9 +92,9 @@ public final class Router {
     }
 
     public void inject(Object object) {
-        AutowiredService autowiredService = ((AutowiredService) build("/router/service/autowired").navigation(context));
-        if (null != autowiredService) {
-            autowiredService.autowire(object);
+        AutowireService autowireService = ((AutowireService) build("/router/service/autowire").navigation(context));
+        if (null != autowireService) {
+            autowireService.autowire(object);
         }
     }
 
@@ -122,7 +121,7 @@ public final class Router {
     }
 
     public Postcard build(String path) {
-        if (StringUtils.isEmpty(path)) {
+        if (TextUtils.isEmpty(path)) {
             throw new MainProcessException(Constant.TAG + "Parameter is invalid!");
         } else {
             PathReplaceService service = navigation(PathReplaceService.class);
@@ -134,7 +133,7 @@ public final class Router {
     }
 
     public Postcard build(Uri uri) {
-        if (uri == null || StringUtils.isEmpty(uri.toString())) {
+        if (uri == null || TextUtils.isEmpty(uri.toString())) {
             throw new MainProcessException(Constant.TAG + "Parameter invalid!");
         } else {
             PathReplaceService service = navigation(PathReplaceService.class);
@@ -146,7 +145,7 @@ public final class Router {
     }
 
     public Postcard build(String path, String group) {
-        if (StringUtils.isEmpty(path) || StringUtils.isEmpty(group)) {
+        if (TextUtils.isEmpty(path) || TextUtils.isEmpty(group)) {
             throw new MainProcessException(Constant.TAG + "Parameter is invalid!");
         } else {
             PathReplaceService service = navigation(PathReplaceService.class);
@@ -160,13 +159,13 @@ public final class Router {
     }
 
     private String extractGroup(String path) {
-        if (StringUtils.isEmpty(path) || !path.startsWith("/")) {
+        if (TextUtils.isEmpty(path) || !path.startsWith("/")) {
             throw new MainProcessException(Constant.TAG + "Extract the default group failed, the path must be start with '/' and contain more than 2 '/'!");
         }
         try {
             String defaultGroup = path.substring(1, path.indexOf("/", 1));
             DebugUtil.getInstance().info(Constant.TAG, defaultGroup);
-            if (StringUtils.isEmpty(defaultGroup)) {
+            if (TextUtils.isEmpty(defaultGroup)) {
                 throw new MainProcessException(Constant.TAG + "Extract the default group failed! There's nothing between 2 '/'!");
             } else {
                 return defaultGroup;
